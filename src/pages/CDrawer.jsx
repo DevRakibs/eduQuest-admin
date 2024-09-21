@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { ExpandCircleDownOutlined, ExpandLess, ExpandMore, FiberManualRecord, GridViewOutlined, Group, GroupOutlined, InsertDriveFileOutlined, KeyboardArrowRight, KeyboardArrowRightOutlined, ListAlt, NotificationsNoneOutlined, Person3, Person3Outlined, PlaylistAdd, Settings, SettingsOutlined, SpaceDashboard, SpaceDashboardOutlined } from '@mui/icons-material';
+import { CommentBankOutlined, ExpandCircleDownOutlined, ExpandLess, ExpandMore, FiberManualRecord, GridViewOutlined, Group, GroupOutlined, ImportContactsOutlined, InsertDriveFileOutlined, KeyboardArrowRight, KeyboardArrowRightOutlined, ListAlt, NotificationsNoneOutlined, Person3, Person3Outlined, PlaylistAdd, Settings, SettingsOutlined, SpaceDashboard, SpaceDashboardOutlined } from '@mui/icons-material';
 import { Badge, Box, Collapse, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material'
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -27,6 +27,8 @@ const CDrawer = ({ handleDrawerClose }) => {
     { name: 'Students', icon: <GroupOutlined />, path: 'students', notification: 0 },
     { name: 'Enrolment', icon: <PlaylistAdd />, path: 'enrolment' },
     { name: 'Resourses', icon: <InsertDriveFileOutlined />, path: 'resourses' },
+    { name: 'Blogs ', icon: <ImportContactsOutlined />, path: '/dashboard/blogs' },
+    { name: 'Faq ', icon: <CommentBankOutlined />, path: '/dashboard/faq' },
     { name: 'Setting ', icon: <SettingsOutlined />, path: '/dashboard/setting' },
     //conditional route
     // ...(user ? (

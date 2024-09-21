@@ -8,24 +8,8 @@ import 'quill-image-uploader/dist/quill.imageUploader.min.css';
 import { Add, Close, Delete, KeyboardArrowDownOutlined, Upload } from '@mui/icons-material';
 import CButton from '../../../common/CButton';
 import CTextField from '../../../common/CTextField';
-import { useRef } from 'react';
 
-// Register the image uploader module
 Quill.register('modules/imageUploader', ImageUploader);
-
-// const toolbarOptions = {
-//   toolbar: [
-//     ['bold', 'italic', 'underline', 'strike'],
-//     ['blockquote'],
-//     [{ header: [1, 2, 3, 4, 5, 6, false] }],
-//     [{ list: 'ordered' }, { list: 'bullet' }],
-//     [{ indent: '-1' }, { indent: '+1' }], // Indentation options
-//     [{ align: [] }],
-//     [{ color: [] }, { background: [] }],
-//     ['link', 'image', 'video'],
-//     ['clean'], // Remove formatting option
-//   ],
-// };
 
 const modules = {
   toolbar: [
@@ -292,17 +276,8 @@ const InfoInput = () => {
           onChange={e => setDescription(e.target.value)}
           modules={modules}
           formats={['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'link', 'image', 'video']}
-          placeholder="Write your blog content here..."
+          placeholder="Write Description here..."
         />
-        {/* <ReactQuill
-          style={{ height: '300px', marginBottom: '70px', borderRadius: '16px' }}
-          modules={toolbarOptions}
-          theme="snow"
-          placeholder="Descriptions*"
-          value={description}
-          onChange={setDescription}
-          required={true}
-        /> */}
       </Stack>
       {/* course image */}
       <Stack>

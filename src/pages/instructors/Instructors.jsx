@@ -92,7 +92,7 @@ const Instructors = () => {
           <Typography variant='body2'>Total Instructors (10)</Typography>
         </Box>
 
-        <Stack direction='row' gap={2} alignItems='center'>
+        <Stack direction='row' gap={2} alignItems='center' justifyContent='space-between'>
           <Box sx={{ minWidth: 150 }} >
             <FormControl fullWidth size='small'>
               <InputLabel>Filter</InputLabel>
@@ -108,7 +108,7 @@ const Instructors = () => {
               </Select>
             </FormControl>
           </Box>
-          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add Instructor</CButton>
+          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add a Instructor</CButton>
         </Stack>
       </Stack>
 

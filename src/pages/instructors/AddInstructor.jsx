@@ -34,11 +34,14 @@ const AddInstructor = ({ onClose }) => {
       </Stack>
 
       <Stack gap={2}>
-        <Stack direction='row' gap={2}>
+        <Stack direction="row" gap={2} alignItems="center">
           <Avatar />
-          <Button variant='outlined' type='label'>
-            <input type="file" />
-          </Button>
+          <input accept="image/*" hidden id="file" type="file" />
+          <label htmlFor="file">
+            <Button size='small' variant="outlined" component="span">
+              Upload
+            </Button>
+          </label>
         </Stack>
         <Stack direction={{ xs: 'column', md: 'row' }} gap={2}>
           <CTextField

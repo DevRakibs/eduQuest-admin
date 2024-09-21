@@ -11,15 +11,15 @@ import { Toaster } from 'react-hot-toast'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <UserProvider>
+    <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ScrollToTop />
-        <Toaster position="bottom-center" />
-        <BrowserRouter>
+        <UserProvider>
+          <CssBaseline />
+          <ScrollToTop />
+          <Toaster position="bottom-center" />
           <App />
-        </BrowserRouter>
+        </UserProvider>
       </ThemeProvider>
-    </UserProvider>
+    </BrowserRouter>
   </StrictMode>,
 )

@@ -36,15 +36,10 @@ const DataTable = ({
 
   return (
     <Box
-      sx={{
-        // minHeight: '650px',
-        // height: '100%',
-        ...sx,
-
-      }}
+      sx={{ width: { xs: '96vw', md: '100%' } }}
     >
       <DataGrid
-        sx={{ bgcolor: '#fff' }}
+        sx={{ bgcolor: '#fff', }}
         rows={rows}
         columns={columns}
         autoHeight

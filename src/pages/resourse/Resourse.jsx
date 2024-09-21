@@ -133,8 +133,8 @@ const Resourse = () => {
           <Typography variant='body2'>Total Resourses (10)</Typography>
         </Box>
 
-        <Stack direction='row' gap={2} alignItems='center'>
-          <Box sx={{ minWidth: 220 }} >
+        <Stack direction='row' gap={2} alignItems='center' justifyContent='space-between'>
+          <Box sx={{ minWidth: 120 }} >
             <FormControl fullWidth size='small'>
               <InputLabel>Category</InputLabel>
               <Select
@@ -143,9 +143,9 @@ const Resourse = () => {
                 onChange={(e) => setCategory(e.target.value)}
               >
                 <MenuItem value={10}>All</MenuItem>
-                <MenuItem value={10}>Wordpress theme</MenuItem>
-                <MenuItem value={10}>Plugins</MenuItem>
-                <MenuItem value={20}>Premuim theme</MenuItem>
+                <MenuItem value={20}>Wordpress theme</MenuItem>
+                <MenuItem value={30}>Plugins</MenuItem>
+                <MenuItem value={40}>Premuim theme</MenuItem>
               </Select>
             </FormControl>
           </Box>

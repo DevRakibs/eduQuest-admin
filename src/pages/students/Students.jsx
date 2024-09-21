@@ -25,7 +25,7 @@ const Students = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false)
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'id', headerName: 'ID', width: 100 },
     {
       field: 'Students',
       headerName: 'Students',
@@ -95,8 +95,8 @@ const Students = () => {
           <Typography variant='body2'>Total Students (10)</Typography>
         </Box>
 
-        <Stack direction='row' gap={2} alignItems='center'>
-          <Box sx={{ minWidth: 220 }} >
+        <Stack direction='row' justifyContent='space-between' gap={2} alignItems='center'>
+          <Box sx={{ minWidth: 120 }} >
             <FormControl fullWidth size='small'>
               <InputLabel>Status</InputLabel>
               <Select
@@ -111,7 +111,7 @@ const Students = () => {
               </Select>
             </FormControl>
           </Box>
-          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add Student</CButton>
+          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add a Student</CButton>
         </Stack>
       </Stack>
 

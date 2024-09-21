@@ -10,6 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { Grow, Slide } from '@mui/material';
+import useIsMobile from '../hook/useIsMobile';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} />;
@@ -17,10 +18,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 export default function CDialog({ open, onClose, children, maxWidth, fullScreen }) {
-
+  const isMobile = useIsMobile()
   return (
     <Dialog
-      fullScreen={fullScreen}
+      fullScreen={isMobile ? true : fullScreen}
       TransitionComponent={Transition}
       maxWidth={maxWidth}
       fullWidth

@@ -26,7 +26,7 @@ const Enrolment = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false)
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'id', headerName: 'ID', width: 100 },
     {
       field: 'Students',
       headerName: 'Students',
@@ -106,8 +106,8 @@ const Enrolment = () => {
           <Typography variant='body2'>Total Enrollments (10)</Typography>
         </Box>
 
-        <Stack direction='row' gap={2} alignItems='center'>
-          <Box sx={{ minWidth: 220 }} >
+        <Stack direction='row' gap={2} alignItems='center' justifyContent='space-between'>
+          <Box sx={{ minWidth: 120 }} >
             <FormControl fullWidth size='small'>
               <InputLabel>Status</InputLabel>
               <Select

@@ -163,7 +163,7 @@ const rows = [
 ];
 
 
-const CourseList = () => {
+const Course = () => {
   const [category, setCategory] = useState('');
 
   const columns = [
@@ -229,8 +229,8 @@ const CourseList = () => {
           <Typography variant='body2'>Total Courses (10)</Typography>
         </Box>
 
-        <Stack direction='row' gap={2} alignItems='center'>
-          <Box sx={{ minWidth: 220 }} >
+        <Stack direction='row' gap={2} justifyContent='space-between' alignItems='center'>
+          <Box sx={{ minWidth: 120 }} >
             <FormControl fullWidth size='small'>
               <InputLabel>Category</InputLabel>
               <Select
@@ -246,7 +246,7 @@ const CourseList = () => {
             </FormControl>
           </Box>
           <Link to='add'>
-            <CButton contained startIcon={<Add />} >Add Course</CButton>
+            <CButton contained startIcon={<Add />} >Add</CButton>
           </Link>
         </Stack>
       </Stack>
@@ -264,4 +264,4 @@ const CourseList = () => {
   )
 }
 
-export default CourseList
+export default Course
