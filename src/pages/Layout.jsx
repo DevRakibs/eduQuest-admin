@@ -12,15 +12,16 @@ import { useState } from 'react';
 import { Avatar, Badge, ClickAwayListener, Divider, FormControlLabel, Grow, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Switch, Zoom } from '@mui/material';
 import { Logout, NotificationsNone, Person, PersonOutline, SettingsOutlined } from '@mui/icons-material';
 import BreadCrumb from '../common/BreadCrumb';
-import { useUserContext } from '../context/UserProvider';
+import { useAuth } from '../context/AuthProvider';
 
 const drawerWidth = 260;
 
 function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+
+  const { setToken } = useAuth()
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -111,7 +112,7 @@ function Layout() {
                   </Link>
                 </Stack>
                 <Divider />
-                <ListItemButton>
+                <ListItemButton onClick={() => setToken('')}>
                   <ListItemIcon sx={{ minWidth: '30px' }}>
                     <Logout fontSize='small' />
                   </ListItemIcon>

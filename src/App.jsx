@@ -1,8 +1,8 @@
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NotFound from './pages/notFound/Index'
 import { useEffect } from 'react'
 import Layout from './pages/Layout'
-import SignIn from './pages/signIn/SignIn'
+import Login from './pages/login/Login'
 import Dashboard from './pages/dashboard/Dashboard'
 import Course from './pages/courses/course/Course'
 import Categories from './pages/courses/catagories/Categories'
@@ -17,6 +17,7 @@ import Setting from './pages/settings/Setting'
 import Blogs from './pages/blogs/Blogs'
 import Faq from './pages/faq/Faq'
 import { Box } from '@mui/material'
+import { useAuth } from './context/AuthProvider'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -29,14 +30,17 @@ const ScrollToTop = () => {
 
 function App() {
 
+  const { token } = useAuth()
+
   return (
     <Box
       sx={{ overflowX: 'hidden' }}
     >
       <ScrollToTop />
       <Routes>
-        <Route path='/signin' element={<SignIn />} />
-        <Route path='/dashboard' element={<Layout />}>
+        <Route path='/' element={<Navigate to={token ? '/dashboard' : '/login'} />} />
+        <Route path='/login' element={token ? <Navigate to='/dashboard' /> : <Login />} />
+        <Route path='/dashboard' element={token ? <Layout /> : <Login />}>
           <Route path='' element={<Dashboard />} />
           <Route path='notifications' element={<Notifications />} />
           <Route path='courses' element={<Course />} />
