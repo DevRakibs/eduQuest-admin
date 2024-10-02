@@ -6,5 +6,5 @@ const baseURL = window.location.hostname === 'localhost'
 
 export const axiosReq = axios.create({
   baseURL: baseURL,
-  withCredentials: true
+  // withCredentials: true
 });
