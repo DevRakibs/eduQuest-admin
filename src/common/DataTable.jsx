@@ -29,9 +29,11 @@ const DataTable = ({
   onRowSelectionModelChange,
   columnVisibilityModel,
   pageSize = 10,
+  getRowId,
   pageSizeOptions = [10, 25, 50],
   noRowsLabel = 'No data available',
   sx,
+  loading
 }) => {
 
   return (
@@ -43,6 +45,8 @@ const DataTable = ({
         rows={rows}
         columns={columns}
         autoHeight
+        loading={loading}
+        getRowId={getRowId}
         rowHeight={rowHeight}
         getRowHeight={getRowHeight}
         initialState={{

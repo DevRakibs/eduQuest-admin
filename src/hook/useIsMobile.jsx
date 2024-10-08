@@ -1,10 +1,7 @@
 import { useMediaQuery } from "@mui/material";
-import React from 'react'
-
-
 
 const useIsMobile = () => {
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'))
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
   return isMobile
 }
 

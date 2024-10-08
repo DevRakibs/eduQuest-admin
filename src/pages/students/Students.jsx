@@ -24,6 +24,9 @@ const Students = () => {
   const [status, setStatus] = useState('');
   const [addDialogOpen, setAddDialogOpen] = useState(false)
 
+
+  const closeDialog = () => setAddDialogOpen(false)
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 100 },
     {
@@ -116,8 +119,8 @@ const Students = () => {
       </Stack>
 
       {/* add student  */}
-      <CDialog open={addDialogOpen}>
-        <AddStudent onClose={() => setAddDialogOpen(false)} />
+      <CDialog open={addDialogOpen} title='Add Student' onClose={closeDialog}>
+        <AddStudent onClose={closeDialog} />
       </CDialog>
 
       <Box mt={4}>

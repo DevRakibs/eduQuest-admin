@@ -26,12 +26,6 @@ const AddStudent = ({ onClose }) => {
 
   return (
     <Box>
-      <Stack direction='row' alignItems='center' justifyContent='space-between'>
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>Add Student</Typography>
-        <IconButton onClick={onClose}>
-          <Close />
-        </IconButton>
-      </Stack>
 
       <Stack gap={2}>
         <Stack direction="row" gap={2} alignItems="center">

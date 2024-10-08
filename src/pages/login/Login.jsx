@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { KeyboardArrowLeft, Visibility, VisibilityOff } from '@mui/icons-material';
 import toast from 'react-hot-toast';
 import CButton from '../../common/CButton';
-import { useAuth } from '../../context/AuthProvider';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosReq } from '../../../utils/axiosReq';
+import useAuth from '../../hook/useAuth';
 
 const Login = () => {
   const [passwordVisibility, setPasswordVisibility] = useState(false);

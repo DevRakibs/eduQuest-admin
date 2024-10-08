@@ -1,9 +1,8 @@
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material'
 import { useState } from 'react';
-import CButton from '../../../common/CButton';
-import InfoInput from './InfoInput';
-import ContentInput from './ContentInput';
 import CTabPanel from '../../../common/CTabPanel';
+import AddInfo from './AddInfo';
+import AddContent from './AddContent';
 
 const AddCourse = () => {
   const [value, setValue] = useState(0);
@@ -25,10 +24,10 @@ const AddCourse = () => {
         <Tab label="Course Content" />
       </Tabs>
       <CTabPanel value={value} index={0}>
-        <InfoInput />
+        <AddInfo />
       </CTabPanel>
       <CTabPanel value={value} index={1}>
-        <ContentInput />
+        <AddContent />
       </CTabPanel>
     </Box >
   )

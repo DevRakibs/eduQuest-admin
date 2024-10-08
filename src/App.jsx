@@ -17,7 +17,10 @@ import Setting from './pages/settings/Setting'
 import Blogs from './pages/blogs/Blogs'
 import Faq from './pages/faq/Faq'
 import { Box } from '@mui/material'
-import { useAuth } from './context/AuthProvider'
+import useAuth from './hook/useAuth'
+import ForgotePass from './pages/forgotePass/ForgotePass'
+import PasswordReset from './pages/password-reset/PasswordReset'
+import CourseDetails from './pages/courses/course/CourseDetails'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -40,18 +43,21 @@ function App() {
       <Routes>
         <Route path='/' element={<Navigate to={token ? '/dashboard' : '/login'} />} />
         <Route path='/login' element={token ? <Navigate to='/dashboard' /> : <Login />} />
+        <Route path='forgot-password' element={<ForgotePass />} />
+        <Route path='password-reset/:token' element={<PasswordReset />} />
         <Route path='/dashboard' element={token ? <Layout /> : <Login />}>
           <Route path='' element={<Dashboard />} />
-          <Route path='notifications' element={<Notifications />} />
-          <Route path='courses' element={<Course />} />
-          <Route path='courses/add' element={<AddCourse />} />
-          <Route path='courses/categories' element={<Categories />} />
-          <Route path='instructors' element={<Instructors />} />
-          <Route path='instructors/:id' element={<InstructorDetails />} />
-          <Route path='students' element={<Students />} />
+          <Route path='notification' element={<Notifications />} />
+          <Route path='course' element={<Course />} />
+          <Route path='course/:id' element={<CourseDetails />} />
+          <Route path='course/add' element={<AddCourse />} />
+          <Route path='course/category' element={<Categories />} />
+          <Route path='instructor' element={<Instructors />} />
+          <Route path='instructor/:id' element={<InstructorDetails />} />
+          <Route path='student' element={<Students />} />
           <Route path='enrolment' element={<Enrolment />} />
-          <Route path='resourses' element={<Resourse />} />
-          <Route path='blogs' element={<Blogs />} />
+          <Route path='resourse' element={<Resourse />} />
+          <Route path='blog' element={<Blogs />} />
           <Route path='faq' element={<Faq />} />
           <Route path='setting' element={<Setting />} />
           <Route path='*' element={<NotFound />} />

@@ -1,26 +1,24 @@
-import React, { useState } from 'react';
+/* eslint-disable react/prop-types */
+import React, { useEffect, useState } from 'react';
 import { TextField, Button, Box, Grid, Typography, MenuItem, Stack, IconButton, Avatar } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import CTextField from '../../common/CTextField';
 import CButton from '../../common/CButton';
 import toast from 'react-hot-toast';
-import { uploadImage } from '../../../utils/upload';
+import { deleteImage, uploadImage } from '../../../utils/upload';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosReq } from '../../../utils/axiosReq';
 import useAuth from '../../hook/useAuth';
+import { Link } from 'react-router-dom';
 
-const AddInstructor = ({ onClose }) => {
+const EditInstructor = ({ data, onClose }) => {
   const [file, setFile] = useState(null);
   const [imgUploading, setImgUploading] = useState(false)
   const [instructor, setInstructor] = useState({
     name: '',
-    username: '',
-    role: 'instructor',
-    email: '',
     phone: '',
     address: '',
     about: '',
-    img: ''
   });
 
   const { token } = useAuth()
@@ -28,7 +26,7 @@ const AddInstructor = ({ onClose }) => {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (input) => axiosReq.post('/auth/admin-create-user', input, { headers: { Authorization: token } }),
+    mutationFn: (input) => axiosReq.put(`/auth/user/edit/${data._id}`, input, { headers: { Authorization: token } }),
     onSuccess: (res) => {
       toast.success(res.data);
       queryClient.invalidateQueries(['instructor'])
@@ -45,22 +43,18 @@ const AddInstructor = ({ onClose }) => {
     setInstructor((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    if (!instructor.username) {
-      toast.error('User name required');
-      return;
-    }
-    if (!instructor.email) {
-      toast.error('Email required');
-      return;
-    }
+  const publicId = data.img.split('/').pop().split('.')[0];
+
+
+  const handleUpdate = async () => {
     if (!instructor.phone) {
       toast.error('Phone number required');
       return;
     }
-    let imgUrl = ''
+    let imgUrl = data.img
     if (file) {
       setImgUploading(true)
+      await deleteImage(publicId)
       const { secure_url } = await uploadImage(file);
       imgUrl = secure_url;
       setImgUploading(false)
@@ -71,11 +65,20 @@ const AddInstructor = ({ onClose }) => {
     })
   };
 
+  useEffect(() => {
+    setInstructor({
+      name: data.name,
+      phone: data.phone,
+      address: data.address,
+      about: data.about,
+    });
+  }, [data]);
+
   return (
     <Box>
       <Stack gap={2}>
         <Stack direction="row" gap={2} alignItems="center">
-          <Avatar src={file ? URL.createObjectURL(file) : ''} />
+          <Avatar src={file ? URL.createObjectURL(file) : data.img} />
           <input accept="image/*" hidden id="file" type="file" onChange={(e) => setFile(e.target.files[0])} />
           <label htmlFor="file">
             <Button size='small' variant="outlined" component="span">
@@ -83,6 +86,14 @@ const AddInstructor = ({ onClose }) => {
             </Button>
           </label>
         </Stack>
+
+        <Box>
+
+          <Typography> <b>UserName:</b> <Link to={`${data._id}`}> @{data.username}</Link></Typography>
+
+          <Typography> <b>Email:</b> {data.email}</Typography>
+        </Box>
+
         <Stack direction={{ xs: 'column', md: 'row' }} gap={2}>
           <CTextField
             topLabel="Full Name"
@@ -92,28 +103,11 @@ const AddInstructor = ({ onClose }) => {
             onChange={handleChange}
             required
           />
-          <CTextField
-            topLabel="User Name"
-            size='small'
-            name="username"
-            value={instructor.username}
-            onChange={handleChange}
-            fullWidth
-            required
-          />
+
         </Stack>
 
         <Stack direction={{ xs: 'column', md: 'row' }} gap={2}>
-          <CTextField
-            topLabel="Email Address"
-            size='small'
-            name="email"
-            type="email"
-            value={instructor.email}
-            onChange={handleChange}
-            fullWidth
-            required
-          />
+
           <CTextField
             topLabel="Phone Number"
             size='small'
@@ -144,12 +138,12 @@ const AddInstructor = ({ onClose }) => {
           rows={3}
         />
 
-        <CButton loading={mutation.isPending || imgUploading} contained onClick={handleSave}>
-          Add Instructor
+        <CButton loading={mutation.isPending || imgUploading} contained onClick={handleUpdate}>
+          Update Instructor
         </CButton>
       </Stack>
     </Box >
   );
 };
 
-export default AddInstructor;
+export default EditInstructor;

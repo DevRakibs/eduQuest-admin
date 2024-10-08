@@ -28,12 +28,6 @@ const EnrollStudent = ({ onClose }) => {
 
   return (
     <Box>
-      <Stack direction='row' alignItems='center' justifyContent='space-between'>
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>Enroll a Student</Typography>
-        <IconButton onClick={onClose}>
-          <Close />
-        </IconButton>
-      </Stack>
 
       <Stack gap={2}>
         {/* select student */}

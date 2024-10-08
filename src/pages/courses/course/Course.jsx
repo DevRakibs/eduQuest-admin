@@ -4,216 +4,106 @@ import React, { useState } from 'react'
 import CButton from '../../../common/CButton'
 import DataTable from '../../../common/DataTable';
 import { Link } from 'react-router-dom';
-
-const rows = [
-  {
-    id: 1,
-    courseName: { initials: 'RD', name: 'Responsive Design', color: '#8e6ac8' },
-    category: 'Web Development',
-    instructor: 'Alex Ashley',
-    lesson: 32,
-    enrolment: 25,
-    status: 'Active',
-    price: '$30',
-    deadline: '20.4.2021',
-  },
-  {
-    id: 2,
-    courseName: { initials: 'AD', name: 'Android Development', color: '#26c6da' },
-    category: 'Mobile Application',
-    instructor: 'Michael Wood',
-    lesson: 11,
-    enrolment: 7,
-    status: 'Pending',
-    price: '$65',
-    deadline: '10.5.2021',
-  },
-  {
-    id: 3,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 4,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 5,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 6,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 7,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 8,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 9,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 10,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 11,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 12,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 13,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-  {
-    id: 14,
-    courseName: { initials: 'UD', name: 'UI/UX Design', color: '#ffb300' },
-    category: 'Graphics Design',
-    instructor: 'Abu Bin Istiak',
-    lesson: 12,
-    enrolment: 8,
-    status: 'Active',
-    price: '$20',
-    deadline: '15.4.2021',
-  },
-];
+import { axiosReq } from '../../../../utils/axiosReq';
+import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import CDialog from '../../../common/CDialog';
+import EditInfo from './EditInfo';
 
 
 const Course = () => {
   const [category, setCategory] = useState('');
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [course, setCourse] = useState(null);
+
+  const { data: courses, isLoading } = useQuery({
+    queryKey: ['course'],
+    queryFn: () => axiosReq.get('/course/all')
+  })
+
+  function handleEdit(course) {
+    setEditDialogOpen(true);
+    setCourse(course);
+  }
+  console.log(courses)
+  const handleDialog = () => setEditDialogOpen(false)
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
     {
-      field: 'courseName',
-      headerName: 'Course Name',
+      field: 'id', headerName: 'ID', width: 100,
+      renderCell: (params) => <Link
+        style={{ textDecoration: 'none' }}
+        to={`${params.row._id}`}>
+        # {params.row._id}
+      </Link>
+    },
+    {
+      field: 'course',
+      headerName: 'Course',
       width: 250,
       renderCell: (params) => (
         <Box display="flex" alignItems="center" height='100%'>
-          <Avatar sx={{ bgcolor: params.value.color, mr: 1 }}>{params.value.initials}</Avatar>
-          <Typography>{params.value.name}</Typography>
+          <Avatar src={params.row.cover || '/no-image.png'} sx={{ borderRadius: '4px', mr: 1 }} />
+          <Box>
+            <Typography>{params.row.title}</Typography>
+            <Typography variant='body2' color='text.secondary'>{params.row.category.name}</Typography>
+          </Box>
         </Box>
       ),
     },
-    { field: 'category', headerName: 'Category', width: 200 },
-    { field: 'instructor', headerName: 'Instructor', width: 150 },
+
     {
-      field: 'lesson',
-      headerName: 'Lesson',
+      field: 'instructor',
+      headerName: 'Instructor',
       width: 200,
-      renderCell: (params) => `Total lesson: ${params.value}`,
+      renderCell: (params) => (
+        <Box display="flex" alignItems="center" height='100%'>
+          <Link to={`/instructor/${params.row.instructor._id}`} style={{ textDecoration: 'none' }}>
+            <Typography>{params.row.instructor.username}</Typography>
+          </Link>
+        </Box>
+      ),
     },
     {
-      field: 'enrolment',
-      headerName: 'Enrole Student',
-      width: 200,
-      renderCell: (params) => `Total enrolment: ${params.value}`,
+      field: 'date',
+      headerName: 'Date',
+      width: 250,
+      renderCell: (params) => (
+        <Stack height='100%' justifyContent='center'>
+          <Typography> <b>Start Date:</b> {format(params.row.startDate, 'dd-MMM-yyyy')}</Typography>
+          <Typography> <b>End Date:</b> {format(params.row.endDate, 'dd-MMM-yyyy')}</Typography>
+        </Stack>
+      ),
+    },
+
+    {
+      field: 'info',
+      headerName: 'Info',
+      width: 150,
+      renderCell: (params) => (
+        <Stack justifyContent="center" height='100%'>
+          <Typography><b>Enrolled:</b> {params.row.studentsEnrolled.length}</Typography>
+          <Typography><b>Price:</b> {params.row.price} tk</Typography>
+        </Stack>
+      ),
     },
     {
       field: 'status',
       headerName: 'Status',
       width: 150,
       renderCell: (params) => (
-        <Chip label={params.value} color={params.value === 'Active' ? 'success' : 'warning'} />
+        <Chip label={params.row.status} color={params.row.status === 'active' ? 'success' : 'warning'} />
       ),
     },
-    { field: 'price', headerName: 'Price', width: 100 },
-    { field: 'deadline', headerName: 'Deadline', width: 150 },
+
     {
       field: 'options',
       headerName: '',
       width: 100,
       renderCell: (params) => (
         <Stack direction='row' alignItems='center' height='100%'>
-          <IconButton>
+          <IconButton onClick={() => handleEdit(params.row)} >
             <EditOutlined fontSize='small' />
-          </IconButton>
-          <IconButton>
-            <DeleteOutline fontSize='small' />
           </IconButton>
         </Stack>
       ),
@@ -253,12 +143,18 @@ const Course = () => {
 
       <Box mt={4}>
         <DataTable
-          rows={rows}
+          rows={courses?.data || []}
+          getRowId={(row) => row._id}
           columns={columns}
+          loading={isLoading}
           rowHeight={70}
           noRowsLabel='No Course Available'
         />
       </Box>
+
+      <CDialog maxWidth='md' open={editDialogOpen} title='Edit Course' onClose={handleDialog}>
+        <EditInfo course={course} onClose={handleDialog} />
+      </CDialog>
 
     </Box>
   )

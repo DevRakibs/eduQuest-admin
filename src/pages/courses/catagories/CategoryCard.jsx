@@ -1,40 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Card, CardContent, Typography, Avatar, Chip, Box, IconButton } from '@mui/material';
 import { BorderColorOutlined, EditOutlined } from '@mui/icons-material';
+import CDialog from '../../../common/CDialog';
+import EditCategory from './EditCategory';
 
-const CategoryCard = () => {
+const CategoryCard = ({ data }) => {
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
 
-
+  const handleDialog = () => setEditDialogOpen(p => !p)
   return (
     <Card sx={{ maxWidth: 345, width: '100%', borderRadius: 2, p: 1 }}>
       <CardContent>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Avatar sx={{ bgcolor: '#8e6ac8', width: 40, height: 40, mr: 2 }}>GD</Avatar>
+          <Avatar sx={{ bgcolor: '#8e6ac8', width: 40, height: 40, mr: 2 }} src={data.img || '/no-image.png'} />
           <Box flex="1">
             <Typography variant="h6" fontWeight="bold">
-              Graphics Design
+              {data.name}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              4 SubCategories
+              {data.subCategories.length} SubCategories
             </Typography>
           </Box>
-          <IconButton>
+          <IconButton onClick={handleDialog}>
             <BorderColorOutlined />
           </IconButton>
         </Box>
         <Typography variant="body2" color="textSecondary" mt={2}>
-          Website Design & Develop the website with web applications
+          {data.description}
         </Typography>
         <Box mt={2} display="flex" gap={1} flexWrap="wrap">
-          <Chip label="Photoshop" sx={{ bgcolor: '#e1f5fe', color: '#0288d1' }} />
-          <Chip label="Adobe Illustrator" sx={{ bgcolor: '#ffebee', color: '#e53935' }} />
-          <Chip label="Logo Design" sx={{ bgcolor: '#e3f2fd', color: '#1e88e5' }} />
-          <Chip label="Drawing" sx={{ bgcolor: '#fff3e0', color: '#fb8c00' }} />
-          <Chip label="Figma" sx={{ bgcolor: '#eceff1', color: '#37474f' }} />
+          {
+            data.subCategories.map(sub => (
+              <Chip key={sub} label={sub} sx={{ bgcolor: '#e1f5fe', color: '#0288d1' }} />
+            ))
+          }
         </Box>
       </CardContent>
+      <CDialog open={editDialogOpen} title='Edit Category' onClose={handleDialog}>
+        <EditCategory onClose={handleDialog} category={data} />
+      </CDialog>
     </Card >
   );
+};
+
+CategoryCard.propTypes = {
+  data: PropTypes.object.isRequired,
 };
 
 export default CategoryCard;

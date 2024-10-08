@@ -1,34 +1,43 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
-import Button from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
-import { Grow, Slide } from '@mui/material';
+import { Grow, Stack } from '@mui/material';
 import useIsMobile from '../hook/useIsMobile';
+import { Close } from '@mui/icons-material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} />;
 });
 
+export default function CDialog({ open, onClose, children, maxWidth, fullScreen, title, disableOutsideClick }) {
+  const isMobile = useIsMobile();
 
-export default function CDialog({ open, onClose, children, maxWidth, fullScreen }) {
-  const isMobile = useIsMobile()
   return (
     <Dialog
-      fullScreen={isMobile ? true : fullScreen}
+      fullScreen={isMobile || fullScreen}
       TransitionComponent={Transition}
       maxWidth={maxWidth}
       fullWidth
-      onClose={onClose}
+      onClose={(event, reason) => {
+        if (reason === 'backdropClick' && !disableOutsideClick) {
+          onClose(event, reason);
+        } else if (reason !== 'backdropClick') {
+          onClose(event, reason);
+        }
+      }}
       open={open}
+      disableEscapeKeyDown
     >
       <DialogContent>
+        <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ marginBottom: 2 }}>
+          <Typography variant="h6">{title || 'Dialog Title'}</Typography>
+          <IconButton onClick={onClose} aria-label="close">
+            <Close />
+          </IconButton>
+        </Stack>
         {children}
       </DialogContent>
     </Dialog>

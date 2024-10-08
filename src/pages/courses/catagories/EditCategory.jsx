@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField, Button, IconButton, Typography, Stack } from '@mui/material';
 import { Add as AddIcon, Close } from '@mui/icons-material';
 import CTextField from '../../../common/CTextField';
@@ -7,9 +7,10 @@ import useAuth from '../../../hook/useAuth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosReq } from '../../../../utils/axiosReq';
 import CButton from '../../../common/CButton';
-import { uploadImage } from '../../../../utils/upload';
+import { deleteImage, uploadImage } from '../../../../utils/upload';
+import PropTypes from 'prop-types';
 
-const AddCategory = ({ onClose }) => {
+const EditCategory = ({ onClose, category }) => {
   const [file, setFile] = useState(null);
   const [subCategory, setSubCategory] = useState('');
   const [subCategories, setSubCategories] = useState([]);
@@ -22,11 +23,11 @@ const AddCategory = ({ onClose }) => {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (input) => axiosReq.post('/category/create', input, { headers: { Authorization: token } }),
+    mutationFn: (input) => axiosReq.put(`/category/update/${category._id}`, input, { headers: { Authorization: token } }),
     onSuccess: (res) => {
+      queryClient.invalidateQueries(['categories'])
       toast.success(res.data);
       onClose()
-      queryClient.invalidateQueries(['categories'])
     },
     onError: (error) => {
       toast.error(error.response.data);
@@ -63,9 +64,13 @@ const AddCategory = ({ onClose }) => {
       toast.error('Please add at least one subcategory')
       return
     }
-    let imgUrl = ''
+    let imgUrl = category?.img
     if (file) {
       setImgUploading(true)
+      if (category?.img) {
+        const publicId = category.img.split('/').pop().split('.')[0];
+        await deleteImage(publicId);
+      }
       const { secure_url } = await uploadImage(file);
       imgUrl = secure_url;
       setImgUploading(false)
@@ -77,6 +82,12 @@ const AddCategory = ({ onClose }) => {
       img: imgUrl
     })
   };
+
+  useEffect(() => {
+    setCategoryName(category.name)
+    setDescription(category.description)
+    setSubCategories(category.subCategories)
+  }, [category])
 
   return (
     <Stack gap={2}>
@@ -115,13 +126,13 @@ const AddCategory = ({ onClose }) => {
             onChange={(e) => setFile(e.target.files[0])}
           />
         </Button>
-        {file &&
+        {(file || category?.img) && (
           <img
             style={{ width: '50px', height: '50px', objectFit: 'contain' }}
-            src={URL.createObjectURL(file)}
+            src={file ? URL.createObjectURL(file) : category?.img}
             alt="Thumbnail"
           />
-        }
+        )}
       </Stack>
 
       <Stack direction='row' flex={1} gap={2} alignItems='center'>
@@ -140,6 +151,7 @@ const AddCategory = ({ onClose }) => {
           }}
           color="primary"
           onClick={handleSubCategory}
+          aria-label="Add subcategory"
         >
           <AddIcon />
         </IconButton>
@@ -150,6 +162,7 @@ const AddCategory = ({ onClose }) => {
           subCategories.map((item, index) => (
             <Typography
               key={index}
+              component="span"
               sx={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -172,10 +185,15 @@ const AddCategory = ({ onClose }) => {
       </Stack>
 
       <CButton loading={mutation.isPending || imgUploading} variant="contained" color="primary" onClick={handleSave}>
-        Save Category
+        Update Category
       </CButton>
     </Stack>
   );
 };
 
-export default AddCategory;
+EditCategory.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  category: PropTypes.object.isRequired,
+};
+
+export default EditCategory;

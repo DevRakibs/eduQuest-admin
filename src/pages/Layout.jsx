@@ -12,7 +12,8 @@ import { useState } from 'react';
 import { Avatar, Badge, ClickAwayListener, Divider, FormControlLabel, Grow, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Switch, Zoom } from '@mui/material';
 import { Logout, NotificationsNone, Person, PersonOutline, SettingsOutlined } from '@mui/icons-material';
 import BreadCrumb from '../common/BreadCrumb';
-import { useAuth } from '../context/AuthProvider';
+import useAuth from '../hook/useAuth';
+import useUser from '../hook/useUser';
 
 const drawerWidth = 260;
 
@@ -22,6 +23,8 @@ function Layout() {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   const { setToken } = useAuth()
+
+  const { user } = useUser()
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -75,10 +78,10 @@ function Layout() {
             </Link>
             <ClickAwayListener onClickAway={() => setUserMenuOpen(false)}>
               <Stack onClick={() => setUserMenuOpen(p => !p)} sx={{ cursor: 'pointer', userSelect: 'none' }} direction='row' gap={1}>
-                <Avatar />
+                <Avatar src={user?.img ?? ''} />
                 <Box>
-                  <Typography sx={{ fontWeight: 600 }}>Rakibul Alam</Typography>
-                  <Typography sx={{ fontSize: '12px' }}>Admin</Typography>
+                  <Typography sx={{ fontWeight: 600 }}>{user?.name}</Typography>
+                  <Typography sx={{ fontSize: '12px' }}>{user?.role}</Typography>
                 </Box>
               </Stack>
             </ClickAwayListener>

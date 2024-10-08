@@ -25,6 +25,8 @@ const Enrolment = () => {
   const [status, setStatus] = useState('');
   const [addDialogOpen, setAddDialogOpen] = useState(false)
 
+  const handleDialog = () => setAddDialogOpen(p => !p)
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 100 },
     {
@@ -123,13 +125,13 @@ const Enrolment = () => {
               </Select>
             </FormControl>
           </Box>
-          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Enroll a Student</CButton>
+          <CButton onClick={handleDialog} contained startIcon={<Add />} >Enroll a Student</CButton>
         </Stack>
       </Stack>
 
       {/* add student  */}
-      <CDialog open={addDialogOpen}>
-        <EnrollStudent onClose={() => setAddDialogOpen(false)} />
+      <CDialog open={addDialogOpen} title='Enroll a Student' onClose={handleDialog}>
+        <EnrollStudent onClose={handleDialog} />
       </CDialog>
 
       <Box mt={4}>

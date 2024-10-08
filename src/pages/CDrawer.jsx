@@ -16,18 +16,19 @@ const CDrawer = ({ handleDrawerClose }) => {
 
   const links = [
     { name: 'Dashboard', icon: <GridViewOutlined />, path: '', end: true },
-    { name: 'Notifications', icon: <NotificationsNoneOutlined />, path: 'notifications', notification: 21 },
+    { name: 'Notifications', icon: <NotificationsNoneOutlined />, path: 'notification', notification: 21 },
     {
       name: 'Courses', icon: <ListAlt />, more: [
-        { name: 'Course List', path: 'courses', end: true },
-        { name: 'Categories', path: 'courses/categories' },
+        { name: 'Course List', path: 'course', end: true },
+        { name: 'Categories', path: 'course/category' },
+        { name: 'Add Course', path: 'course/add' },
       ]
     },
-    { name: 'Instructors', icon: <Person3Outlined />, path: 'instructors', notification: 0 },
-    { name: 'Students', icon: <GroupOutlined />, path: 'students', notification: 0 },
+    { name: 'Instructors', icon: <Person3Outlined />, path: 'instructor', notification: 0 },
+    { name: 'Students', icon: <GroupOutlined />, path: 'student', notification: 0 },
     { name: 'Enrolment', icon: <PlaylistAdd />, path: 'enrolment' },
-    { name: 'Resourses', icon: <InsertDriveFileOutlined />, path: 'resourses' },
-    { name: 'Blogs ', icon: <ImportContactsOutlined />, path: '/dashboard/blogs' },
+    { name: 'Resourses', icon: <InsertDriveFileOutlined />, path: 'resourse' },
+    { name: 'Blogs ', icon: <ImportContactsOutlined />, path: '/dashboard/blog' },
     { name: 'Faq ', icon: <CommentBankOutlined />, path: '/dashboard/faq' },
     { name: 'Setting ', icon: <SettingsOutlined />, path: '/dashboard/setting' },
     //conditional route
