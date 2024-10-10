@@ -6,9 +6,11 @@ import CDialog from '../../../common/CDialog';
 import AddContent from './AddContent';
 import { ExpandMore } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import EditContent from './EditContent';
 
 const ContentDetails = ({ course }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [expanded, setExpanded] = useState(null);
   const handleAccordionChange = (panel) => {
     setExpanded(panel === expanded ? null : panel);
@@ -17,14 +19,19 @@ const ContentDetails = ({ course }) => {
     <Box>
       <Stack direction='row' justifyContent='space-between'>
         <Box />
-        <CButton onClick={() => setDialogOpen(true)} contained>{course?.content.length > 0 ? 'Update' : 'New'} Content</CButton>
+        {
+          course?.content.length > 0 ?
+            <CButton onClick={() => setEditDialogOpen(true)} contained>Update Content</CButton>
+            :
+            <CButton onClick={() => setAddDialogOpen(true)} contained>Add New Content</CButton>
+        }
       </Stack>
       <Typography variant="h5" sx={{ mb: 4, fontWeight: 'bold' }}>
         Course Content
       </Typography>
 
-      {course?.content.length === 0 && <Typography sx={{ textAlign: 'center', mt: 2 }}>No content found</Typography>}
-      {course?.content.map((section, id) => (
+      {course?.content?.length === 0 && <Typography sx={{ textAlign: 'center', mt: 2 }}>No content found</Typography>}
+      {course?.content?.map((section, id) => (
         <Accordion expanded={expanded === section._id} onChange={() => handleAccordionChange(section._id)} sx={{ mb: 2 }} key={section._id}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -33,44 +40,42 @@ const ContentDetails = ({ course }) => {
             </Typography>
           </AccordionSummary>
 
-          <AccordionDetails>
-            <List>
+          <Box sx={{ mt: 2, mb: 2 }}>
+            <Stack spacing={2}>
               {section.content.map((item) => (
-                <React.Fragment key={item._id}>
-                  <ListItem>
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                          {item.title}
-                        </Typography>
-                      }
-                      secondary={
-                        <>
-                          {item.description && (
-                            <Typography variant="body2" sx={{ mb: 1 }}>
-                              {item.description}
-                            </Typography>
-                          )}
-                          <Typography variant="body2" sx={{ mb: 1 }}>
-                            <b>Url: </b>
-                            <Link href={item.url} target="_blank" rel="noopener">
-                              {item.url}
-                            </Link>
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItem>
-                  <Divider />
-                </React.Fragment>
+                <Box px={2} key={item._id}>
+                  <Stack spacing={1}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                      {item.title}
+                    </Typography>
+                    {item.description && (
+                      <Typography variant="body2">
+                        {item.description}
+                      </Typography>
+                    )}
+                    <Typography variant="body2">
+                      <b>Url: </b>
+                      <Link href={item.url} target="_blank" rel="noopener">
+                        {item.url}
+                      </Link>
+                    </Typography>
+                  </Stack>
+                  <Divider sx={{ mt: 2 }} />
+                </Box>
               ))}
-            </List>
-          </AccordionDetails>
+            </Stack>
+          </Box>
         </Accordion>
       ))}
 
-      <CDialog disableOutsideClick maxWidth='md' title='Add New Content' open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <AddContent course={course} onClose={() => setDialogOpen(false)} />
+      {/* add content */}
+      <CDialog disableOutsideClick maxWidth='md' title='Add New Content' open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
+        <AddContent course={course} onClose={() => setAddDialogOpen(false)} />
+      </CDialog>
+
+      {/* edit content */}
+      <CDialog disableOutsideClick maxWidth='md' title='Update Content' open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+        <EditContent course={course} onClose={() => setEditDialogOpen(false)} />
       </CDialog>
     </Box>
   )

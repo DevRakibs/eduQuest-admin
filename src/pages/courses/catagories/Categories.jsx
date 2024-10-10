@@ -16,7 +16,7 @@ const Categories = () => {
   const handleDialog = () => setAddCatDialogOpen(p => !p)
 
   const { data: categories, isLoading, isError } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ['category'],
     queryFn: () => axiosReq.get('/category/all'),
   })
 

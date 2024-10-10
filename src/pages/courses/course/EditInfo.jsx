@@ -124,9 +124,9 @@ const EditInfo = ({ course, onClose }) => {
     setIncludes(includes?.filter((_, i) => i !== index));
   };
 
-  const publicId = course.cover.split('/').pop().split('.')[0];
+  const publicId = course?.cover?.split('/').pop().split('.')[0];
 
-  const handleSaveCourseInfo = () => {
+  const handleSaveCourseInfo = async () => {
     const validateForm = () => {
       const newErrors = {};
       if (!payload.title) newErrors.title = 'Title is required';
@@ -156,14 +156,12 @@ const EditInfo = ({ course, onClose }) => {
     if (file) {
       setImgUploading(true);
       if (course?.cover) {
-        deleteImage(publicId)
-          .then(() => uploadImage(file))
-          .then(({ secure_url }) => {
-            courseData.cover = secure_url;
-            updateMutation.mutate(courseData);
-          })
-          .finally(() => setImgUploading(false));
+        await deleteImage(publicId);
       }
+      const { secure_url } = await uploadImage(file);
+      courseData.cover = secure_url;
+      updateMutation.mutate(courseData);
+      setImgUploading(false);
     } else {
       updateMutation.mutate(courseData);
     }
@@ -178,7 +176,7 @@ const EditInfo = ({ course, onClose }) => {
   useEffect(() => {
     setPayload({
       title: course.title ?? '',
-      category: course.category._id ?? '',
+      category: course.category._id ?? "",
       price: course.price ?? '',
       startDate: course.startDate ? format((course.startDate), 'yyyy-MM-dd') : '',
       endDate: course.endDate ? format((course.endDate), 'yyyy-MM-dd') : '',
@@ -397,6 +395,7 @@ const EditInfo = ({ course, onClose }) => {
         <DialogTitle>Delete Course</DialogTitle>
         <DialogContent>
           <DialogContentText>Are you sure you want to delete this course?</DialogContentText>
+          <DialogContentText color='error'>This action cannot be undone.</DialogContentText>
         </DialogContent>
         <DialogActions>
           <CButton onClick={() => setDeleteDialogOpen(false)}>Cancel</CButton>

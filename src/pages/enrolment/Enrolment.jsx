@@ -1,11 +1,14 @@
-import { Add, DeleteOutline, Edit, EditOutlined, MoreVert } from '@mui/icons-material'
-import { Avatar, Box, Chip, FormControl, IconButton, InputLabel, Menu, MenuItem, Select, Stack, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import { Add, DeleteOutline, EditOutlined, Search } from '@mui/icons-material'
+import { Avatar, Box, Chip, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
+import { useState } from 'react'
 import CButton from '../../common/CButton'
 import DataTable from '../../common/DataTable';
 import { Link } from 'react-router-dom';
 import CDialog from '../../common/CDialog';
 import EnrollStudent from './EnrollStudent';
+import { useQuery } from '@tanstack/react-query';
+import { axiosReq } from '../../../utils/axiosReq';
+import useAuth from '../../hook/useAuth';
 
 const rows = [
   {
@@ -27,75 +30,75 @@ const Enrolment = () => {
 
   const handleDialog = () => setAddDialogOpen(p => !p)
 
+  const { token } = useAuth()
+
+  const { data: enrollments, isLoading } = useQuery({
+    queryKey: ['enrollment'],
+    queryFn: () => axiosReq.get('course/enrolled/all', { headers: { Authorization: token } })
+  })
+  console.log(enrollments?.data)
   const columns = [
-    { field: 'id', headerName: 'ID', width: 100 },
     {
       field: 'Students',
       headerName: 'Students',
       width: 250,
-      renderCell: (params) => (
-        <Stack gap={1} direction='row' alignItems='center' height='100%'>
-          <Avatar />
-          <Box>
-            <Typography sx={{ fontWeight: 600, color: 'text.main' }}>{params.row.name}</Typography>
-            <Typography>{params.row.username}</Typography>
-          </Box>
-        </Stack>
-      ),
+      renderCell: (params) => {
+        const student = params.row.student
+        return (
+          <Stack direction='row' alignItems='center' height='100%'>
+            <Avatar src={student.img ?? ''} sx={{ mr: 1 }} />
+            <Box>
+              <Link to={`/dashboard/student/${student._id}`} style={{ textDecoration: 'none' }}>
+                <Typography>@{student.username}</Typography>
+              </Link>
+              <Typography variant='body2' color='text.secondary'>{params.row.student.email}</Typography>
+            </Box>
+          </Stack>
+        )
+      },
     },
     {
       field: 'Info',
       headerName: 'Info',
       width: 200,
-      renderCell: (params) => (
-        <Stack justifyContent='center' height='100%'>
-          <Typography sx={{ fontWeight: 600, color: 'text.main' }}>{params.row.email}</Typography>
-          <Typography variant='body2'>{params.row.phone}</Typography>
-        </Stack>
-      ),
+      renderCell: (params) => {
+        const student = params.row.student
+        return (
+          <Stack height='100%' justifyContent='center'>
+            <Typography>{student?.name}</Typography>
+            <Typography variant='body2' color='text.secondary'>{student?.phone}</Typography>
+          </Stack>
+        )
+      },
     },
     {
       field: 'EnrolledCourse',
       headerName: 'Enrolled Course',
-      width: 250,
-      renderCell: (params) => (
-        <Stack justifyContent='center' height='100%'>
-          <Typography sx={{ color: 'Highlight' }}>{params.row.enrolledCourse}</Typography>
-        </Stack>
-      ),
-    },
-    {
-      field: 'EnrollmentDate',
-      headerName: 'Enrollment Date',
-      width: 250,
-      renderCell: (params) => (
-        <Stack justifyContent='center' height='100%'>
-          <Typography>{params.row.enrollmentDate}</Typography>
-        </Stack>
-      ),
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 150,
-      renderCell: (params) => (
-        <Chip label={params.value} color={params.value === 'Active' ? 'success' : 'warning'} />
-      ),
-    },
-    {
-      field: 'options',
-      headerName: '',
-      width: 100,
-      renderCell: (params) => (
-        <Stack direction='row' alignItems='center' height='100%'>
-          <IconButton>
-            <EditOutlined fontSize='small' />
-          </IconButton>
-          <IconButton>
-            <DeleteOutline fontSize='small' />
-          </IconButton>
-        </Stack>
-      ),
+      width: 500,
+      renderCell: (params) => {
+        const enrolledCourses = params.row.enrolledCourses
+        return (
+          <Stack justifyContent='center' height='100%'>
+            {enrolledCourses?.length > 2 ? (
+              <>
+                <Link to={`/dashboard/course/${enrolledCourses[0].course._id}`} style={{ textDecoration: 'none' }}>
+                  <Typography>{enrolledCourses[0].course.title}</Typography>
+                </Link>
+                <Link to={`/dashboard/course/${enrolledCourses[1].course._id}`} style={{ textDecoration: 'none' }}>
+                  <Typography>{enrolledCourses[1].course.title}</Typography>
+                </Link>
+                <Typography>+{enrolledCourses.length - 2} more</Typography>
+              </>
+            ) : (
+              enrolledCourses?.map((data) => (
+                <Link key={data.course._id} to={`/dashboard/course/${data.course._id}`} style={{ textDecoration: 'none' }}>
+                  <Typography>{data.course.title}</Typography>
+                </Link>
+              ))
+            )}
+          </Stack>
+        )
+      },
     },
   ];
 
@@ -107,26 +110,7 @@ const Enrolment = () => {
           <Typography variant='h5'>Enrollment List</Typography>
           <Typography variant='body2'>Total Enrollments (10)</Typography>
         </Box>
-
-        <Stack direction='row' gap={2} alignItems='center' justifyContent='space-between'>
-          <Box sx={{ minWidth: 120 }} >
-            <FormControl fullWidth size='small'>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={status}
-                label="Status"
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <MenuItem value={10}>None</MenuItem>
-                <MenuItem value={10}>Pending</MenuItem>
-                <MenuItem value={20}>Waiting</MenuItem>
-                <MenuItem value={30}>Approved</MenuItem>
-                <MenuItem value={30}>Rejected</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <CButton onClick={handleDialog} contained startIcon={<Add />} >Enroll a Student</CButton>
-        </Stack>
+        <CButton onClick={handleDialog} contained startIcon={<Add />} >Enroll a Student</CButton>
       </Stack>
 
       {/* add student  */}
@@ -136,8 +120,10 @@ const Enrolment = () => {
 
       <Box mt={4}>
         <DataTable
-          rows={rows}
+          rows={enrollments?.data || []}
           columns={columns}
+          loading={isLoading}
+          getRowId={(row) => row.student._id}
           rowHeight={70}
           noRowsLabel='No Course Available'
         />

@@ -7,7 +7,6 @@ import Dashboard from './pages/dashboard/Dashboard'
 import Course from './pages/courses/course/Course'
 import Categories from './pages/courses/catagories/Categories'
 import Notifications from './pages/notifications/Notifications'
-import AddCourse from './pages/courses/course/AddCourse'
 import Instructors from './pages/instructors/Instructors'
 import InstructorDetails from './pages/instructors/InstructorDetails'
 import Students from './pages/students/Students'
@@ -50,7 +49,6 @@ function App() {
           <Route path='notification' element={<Notifications />} />
           <Route path='course' element={<Course />} />
           <Route path='course/:id' element={<CourseDetails />} />
-          <Route path='course/add' element={<AddCourse />} />
           <Route path='course/category' element={<Categories />} />
           <Route path='instructor' element={<Instructors />} />
           <Route path='instructor/:id' element={<InstructorDetails />} />

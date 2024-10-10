@@ -1,5 +1,5 @@
-import { Add, DeleteOutline, Edit, EditOutlined, MoreVert } from '@mui/icons-material'
-import { Avatar, Box, Chip, FormControl, IconButton, InputLabel, Menu, MenuItem, Select, Stack, Typography } from '@mui/material'
+import { Add, DeleteOutline, Edit, EditOutlined, MoreVert, Search } from '@mui/icons-material'
+import { Avatar, Box, Chip, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import CButton from '../../common/CButton'
 import DataTable from '../../common/DataTable';
@@ -73,6 +73,14 @@ const Instructors = () => {
 
       }
     },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 150,
+      renderCell: (params) => (
+        <Chip label={params.row.isVerified ? 'Verified' : 'Unverified'} color={params.row.isVerified ? 'success' : 'warning'} />
+      ),
+    },
     // {
     //   field: 'status',
     //   headerName: 'Status',
@@ -133,6 +141,20 @@ const Instructors = () => {
       <CDialog open={editDialogOpen} title='Edit Instructor' onClose={handleDialog}>
         <EditInstructor data={instructor} onClose={handleDialog} />
       </CDialog>
+
+      <Box mt={3} mb={2}>
+        <TextField
+          size="small"
+          placeholder="Search Instructor..."
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
       <Box mt={4}>
         <DataTable

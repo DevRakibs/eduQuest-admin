@@ -11,6 +11,7 @@ import CDialog from '../../../common/CDialog'
 import Loader from '../../../common/Loader'
 import ErrorMsg from '../../../common/ErrorMsg'
 import ContentDetails from './ContentDetails'
+import EnrolledStudent from './EnrolledStudent'
 
 const CourseDetails = () => {
   const [value, setValue] = useState(0);
@@ -26,11 +27,11 @@ const CourseDetails = () => {
     queryKey: ['course', id],
     queryFn: () => axiosReq.get(`/course/${id}`)
   })
-  console.log('course', course)
+
   if (isLoading) return <Loader />
   if (isError) return <ErrorMsg />
   return (
-    <Box maxWidth='md' sx={{
+    <Box maxWidth='lg' sx={{
       bgcolor: '#fff',
       p: 4,
       minHeight: '100vh'
@@ -69,7 +70,7 @@ const CourseDetails = () => {
               ))}
             </Stack>
 
-            <Chip label={`Status: ${course?.data.status}`} color="warning" variant="outlined" sx={{ mt: 1 }} />
+            <Chip sx={{ mt: 2, px: 3 }} label={course?.data.status} color={course?.data.status === 'active' ? 'success' : 'warning'} />
           </CardContent>
         </Grid>
       </Grid>
@@ -79,22 +80,24 @@ const CourseDetails = () => {
       <Tabs value={value} onChange={handleChange}>
         <Tab label="Course Info" />
         <Tab label="Course Content" />
+        <Tab label={`Enrolled Student (${course?.data.studentsEnrolled.length})`} />
       </Tabs>
 
       {/* Course Description */}
       <CTabPanel value={value} index={0}>
-        <Box>
-          <Stack direction='row' justifyContent='space-between'>
-            <Box />
-            <CButton onClick={() => setEditDialogOpen(true)} contained>Update</CButton>
-          </Stack>
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
-            Course Description
-          </Typography>
-          <div dangerouslySetInnerHTML={{ __html: course?.data.description }} />
+        <Stack mb={2} direction='row' justifyContent='space-between'>
+          <Box />
+          <CButton onClick={() => setEditDialogOpen(true)} contained>Update</CButton>
+        </Stack>
+        <Stack direction={{ xs: 'column', md: 'row' }} gap={2}>
+          <Box flex={2}>
+            <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+              Course Info
+            </Typography>
+            <div dangerouslySetInnerHTML={{ __html: course?.data.description }} />
+          </Box>
 
-          {/* What You'll Learn */}
-          <Box sx={{ mt: 3, width: 'fit-content', border: '1px solid #e0e0e0', borderRadius: '8px', px: 4, py: 2 }}>
+          <Box flex={1} mt={{ xs: 0, md: 6 }} sx={{ p: 3, height: '100%', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               Includes in Course
             </Typography>
@@ -106,11 +109,15 @@ const CourseDetails = () => {
               ))}
             </List>
           </Box>
-        </Box>
+        </Stack>
       </CTabPanel>
 
       <CTabPanel value={value} index={1}>
         <ContentDetails course={course?.data} />
+      </CTabPanel>
+
+      <CTabPanel value={value} index={2}>
+        <EnrolledStudent course={course?.data} />
       </CTabPanel>
 
       <CDialog maxWidth='md' title='Update Course Info' open={editDialogOpen} onClose={handleDialog}>

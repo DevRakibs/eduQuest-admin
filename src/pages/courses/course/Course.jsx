@@ -1,5 +1,5 @@
-import { Add, DeleteOutline, Edit, EditOutlined, MoreVert } from '@mui/icons-material'
-import { Avatar, Box, Chip, FormControl, IconButton, InputLabel, Menu, MenuItem, Select, Stack, Typography } from '@mui/material'
+import { Add, DeleteOutline, Edit, EditOutlined, MoreVert, Search } from '@mui/icons-material'
+import { Avatar, Box, Chip, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import CButton from '../../../common/CButton'
 import DataTable from '../../../common/DataTable';
@@ -9,11 +9,14 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import CDialog from '../../../common/CDialog';
 import EditInfo from './EditInfo';
+import AddInfo from './AddInfo';
+import UpdateCourse from './UpdateCourse';
 
 
 const Course = () => {
   const [category, setCategory] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [course, setCourse] = useState(null);
 
   const { data: courses, isLoading } = useQuery({
@@ -25,7 +28,7 @@ const Course = () => {
     setEditDialogOpen(true);
     setCourse(course);
   }
-  console.log(courses)
+
   const handleDialog = () => setEditDialogOpen(false)
 
   const columns = [
@@ -40,7 +43,7 @@ const Course = () => {
     {
       field: 'course',
       headerName: 'Course',
-      width: 250,
+      width: 300,
       renderCell: (params) => (
         <Box display="flex" alignItems="center" height='100%'>
           <Avatar src={params.row.cover || '/no-image.png'} sx={{ borderRadius: '4px', mr: 1 }} />
@@ -55,12 +58,16 @@ const Course = () => {
     {
       field: 'instructor',
       headerName: 'Instructor',
-      width: 200,
+      width: 250,
       renderCell: (params) => (
         <Box display="flex" alignItems="center" height='100%'>
-          <Link to={`/instructor/${params.row.instructor._id}`} style={{ textDecoration: 'none' }}>
-            <Typography>{params.row.instructor.username}</Typography>
-          </Link>
+          <Avatar src={params.row.instructor.img ?? ''} sx={{ mr: 1 }} />
+          <Box>
+            <Link to={`/instructor/${params.row.instructor._id}`} style={{ textDecoration: 'none' }}>
+              <Typography>{params.row.instructor.username}</Typography>
+            </Link>
+            <Typography variant='body2' color='text.secondary'>{params.row.instructor.email}</Typography>
+          </Box>
         </Box>
       ),
     },
@@ -79,7 +86,7 @@ const Course = () => {
     {
       field: 'info',
       headerName: 'Info',
-      width: 150,
+      width: 200,
       renderCell: (params) => (
         <Stack justifyContent="center" height='100%'>
           <Typography><b>Enrolled:</b> {params.row.studentsEnrolled.length}</Typography>
@@ -116,7 +123,7 @@ const Course = () => {
       <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between'>
         <Box>
           <Typography variant='h5'>Courses</Typography>
-          <Typography variant='body2'>Total Courses (10)</Typography>
+          <Typography variant='body2'>Total Courses ({courses?.data?.length})</Typography>
         </Box>
 
         <Stack direction='row' gap={2} justifyContent='space-between' alignItems='center'>
@@ -135,11 +142,23 @@ const Course = () => {
               </Select>
             </FormControl>
           </Box>
-          <Link to='add'>
-            <CButton contained startIcon={<Add />} >Add</CButton>
-          </Link>
+          <CButton contained startIcon={<Add />} onClick={() => setAddDialogOpen(true)} >Add Course</CButton>
         </Stack>
       </Stack>
+
+      <Box mt={3} mb={2}>
+        <TextField
+          size="small"
+          placeholder="Search Course..."
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
       <Box mt={4}>
         <DataTable
@@ -152,10 +171,15 @@ const Course = () => {
         />
       </Box>
 
-      <CDialog maxWidth='md' open={editDialogOpen} title='Edit Course' onClose={handleDialog}>
-        <EditInfo course={course} onClose={handleDialog} />
+      {/* Update course */}
+      <CDialog maxWidth='md' open={editDialogOpen} title='Update Course' onClose={handleDialog}>
+        <UpdateCourse course={course} onClose={handleDialog} />
       </CDialog>
 
+      {/* add course */}
+      <CDialog maxWidth='md' open={addDialogOpen} title='Add Course Info' onClose={() => setAddDialogOpen(false)}>
+        <AddInfo onClose={() => setAddDialogOpen(false)} />
+      </CDialog>
     </Box>
   )
 }

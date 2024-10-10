@@ -26,7 +26,7 @@ const AddCategory = ({ onClose }) => {
     onSuccess: (res) => {
       toast.success(res.data);
       onClose()
-      queryClient.invalidateQueries(['categories'])
+      queryClient.invalidateQueries(['category'])
     },
     onError: (error) => {
       toast.error(error.response.data);
@@ -57,10 +57,6 @@ const AddCategory = ({ onClose }) => {
     }
     if (description === '') {
       toast.error('Please write a description')
-      return
-    }
-    if (subCategories.length === 0) {
-      toast.error('Please add at least one subcategory')
       return
     }
     let imgUrl = ''

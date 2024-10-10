@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Button, IconButton, Typography, Stack } from '@mui/material';
+import { TextField, Button, IconButton, Typography, Stack, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { Add as AddIcon, Close } from '@mui/icons-material';
 import CTextField from '../../../common/CTextField';
 import toast from 'react-hot-toast';
@@ -17,6 +17,7 @@ const EditCategory = ({ onClose, category }) => {
   const [categoryName, setCategoryName] = useState('');
   const [description, setDescription] = useState('');
   const [imgUploading, setImgUploading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { token } = useAuth()
 
@@ -25,9 +26,22 @@ const EditCategory = ({ onClose, category }) => {
   const mutation = useMutation({
     mutationFn: (input) => axiosReq.put(`/category/update/${category._id}`, input, { headers: { Authorization: token } }),
     onSuccess: (res) => {
-      queryClient.invalidateQueries(['categories'])
+      queryClient.invalidateQueries(['category'])
       toast.success(res.data);
       onClose()
+    },
+    onError: (error) => {
+      toast.error(error.response.data);
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => axiosReq.delete(`/category/delete/${category._id}`, { headers: { Authorization: token } }),
+    onSuccess: (res) => {
+      toast.success(res.data);
+      queryClient.invalidateQueries(['category']);
+      setDeleteDialogOpen(false)
+      onClose();
     },
     onError: (error) => {
       toast.error(error.response.data);
@@ -51,6 +65,8 @@ const EditCategory = ({ onClose, category }) => {
     setSubCategories(updatedSubCategories);
   };
 
+  const publicId = category?.img?.split('/').pop().split('.')[0];
+
   const handleSave = async () => {
     if (categoryName === '') {
       toast.error('Please write a category name')
@@ -60,15 +76,10 @@ const EditCategory = ({ onClose, category }) => {
       toast.error('Please write a description')
       return
     }
-    if (subCategories.length === 0) {
-      toast.error('Please add at least one subcategory')
-      return
-    }
     let imgUrl = category?.img
     if (file) {
       setImgUploading(true)
       if (category?.img) {
-        const publicId = category.img.split('/').pop().split('.')[0];
         await deleteImage(publicId);
       }
       const { secure_url } = await uploadImage(file);
@@ -83,6 +94,13 @@ const EditCategory = ({ onClose, category }) => {
     })
   };
 
+  const handleDelete = async () => {
+    if (category?.img) {
+      await deleteImage(publicId);
+    }
+    deleteMutation.mutate()
+  }
+
   useEffect(() => {
     setCategoryName(category.name)
     setDescription(category.description)
@@ -90,104 +108,121 @@ const EditCategory = ({ onClose, category }) => {
   }, [category])
 
   return (
-    <Stack gap={2}>
+    <>
+      <Stack gap={2}>
 
-      <CTextField
-        size='small'
-        topLabel="Category Name"
-        variant="outlined"
-        fullWidth
-        required
-        value={categoryName}
-        onChange={e => setCategoryName(e.target.value)}
-      />
-
-      <CTextField
-        size='small'
-        topLabel="Description"
-        variant="outlined"
-        multiline
-        rows={4}
-        fullWidth
-        required
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-      />
-
-      <Stack direction='row' gap={2} alignItems='center'>
-        <Button
-          variant="outlined"
-          component="label"
-        >
-          Choose Thumbnail
-          <input
-            type="file"
-            hidden
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-        </Button>
-        {(file || category?.img) && (
-          <img
-            style={{ width: '50px', height: '50px', objectFit: 'contain' }}
-            src={file ? URL.createObjectURL(file) : category?.img}
-            alt="Thumbnail"
-          />
-        )}
-      </Stack>
-
-      <Stack direction='row' flex={1} gap={2} alignItems='center'>
-        <TextField
-          onChange={e => setSubCategory(e.target.value)}
+        <CTextField
           size='small'
-          value={subCategory}
-          label="Subcategory"
+          topLabel="Category Name"
           variant="outlined"
           fullWidth
+          required
+          value={categoryName}
+          onChange={e => setCategoryName(e.target.value)}
         />
-        <IconButton
-          sx={{
-            border: '1px solid lightgray',
-            borderRadius: '4px',
-          }}
-          color="primary"
-          onClick={handleSubCategory}
-          aria-label="Add subcategory"
-        >
-          <AddIcon />
-        </IconButton>
-      </Stack>
 
-      <Stack direction='row' flexWrap='wrap' gap={2}>
-        {
-          subCategories.map((item, index) => (
-            <Typography
-              key={index}
-              component="span"
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 1,
-                border: '1px solid lightgray',
-                px: 0.5,
-                borderRadius: '4px'
-              }}
-            >
-              {item}
-              <IconButton
-                size='small'
-                onClick={() => handleRemoveSubCategory(index)}
+        <CTextField
+          size='small'
+          topLabel="Description"
+          variant="outlined"
+          multiline
+          rows={4}
+          fullWidth
+          required
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
+
+        <Stack direction='row' gap={2} alignItems='center'>
+          <Button
+            variant="outlined"
+            component="label"
+          >
+            Choose Thumbnail
+            <input
+              type="file"
+              hidden
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+          </Button>
+          {(file || category?.img) && (
+            <img
+              style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+              src={file ? URL.createObjectURL(file) : category?.img}
+              alt="Thumbnail"
+            />
+          )}
+        </Stack>
+
+        <Stack direction='row' flex={1} gap={2} alignItems='center'>
+          <TextField
+            onChange={e => setSubCategory(e.target.value)}
+            size='small'
+            value={subCategory}
+            label="Subcategory"
+            variant="outlined"
+            fullWidth
+          />
+          <IconButton
+            sx={{
+              border: '1px solid lightgray',
+              borderRadius: '4px',
+            }}
+            color="primary"
+            onClick={handleSubCategory}
+            aria-label="Add subcategory"
+          >
+            <AddIcon />
+          </IconButton>
+        </Stack>
+
+        <Stack direction='row' flexWrap='wrap' gap={2}>
+          {
+            subCategories.map((item, index) => (
+              <Typography
+                key={index}
+                component="span"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  border: '1px solid lightgray',
+                  px: 0.5,
+                  borderRadius: '4px'
+                }}
               >
-                <Close fontSize='small' />
-              </IconButton>
-            </Typography>
-          ))
-        }
-      </Stack>
+                {item}
+                <IconButton
+                  size='small'
+                  onClick={() => handleRemoveSubCategory(index)}
+                >
+                  <Close fontSize='small' />
+                </IconButton>
+              </Typography>
+            ))
+          }
+        </Stack>
 
-      <CButton loading={mutation.isPending || imgUploading} variant="contained" color="primary" onClick={handleSave}>
-        Update Category
-      </CButton>
-    </Stack>
+        {/* delete category */}
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+          <DialogTitle>Delete Category</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Are you sure you want to delete this category?</DialogContentText>
+            <DialogContentText color='error'>This action cannot be undone.</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <CButton onClick={() => setDeleteDialogOpen(false)}>Cancel</CButton>
+            <CButton loading={deleteMutation.isPending} onClick={handleDelete} color="error">Delete</CButton>
+          </DialogActions>
+        </Dialog>
+
+
+        <CButton loading={mutation.isPending || imgUploading} variant="contained" color="primary" onClick={handleSave}>
+          Update Category
+        </CButton>
+      </Stack>
+      <CButton sx={{ mt: 2 }} color='error' onClick={() => setDeleteDialogOpen(true)}>Delete Category</CButton>
+    </>
   );
 };
 

@@ -21,7 +21,6 @@ const CDrawer = ({ handleDrawerClose }) => {
       name: 'Courses', icon: <ListAlt />, more: [
         { name: 'Course List', path: 'course', end: true },
         { name: 'Categories', path: 'course/category' },
-        { name: 'Add Course', path: 'course/add' },
       ]
     },
     { name: 'Instructors', icon: <Person3Outlined />, path: 'instructor', notification: 0 },

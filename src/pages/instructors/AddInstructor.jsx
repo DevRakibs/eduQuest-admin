@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Grid, Typography, MenuItem, Stack, IconButton, Avatar } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Box, Stack, Avatar, Button, Typography, ListItem } from '@mui/material';
 import CTextField from '../../common/CTextField';
 import CButton from '../../common/CButton';
 import toast from 'react-hot-toast';
@@ -8,6 +7,7 @@ import { uploadImage } from '../../../utils/upload';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosReq } from '../../../utils/axiosReq';
 import useAuth from '../../hook/useAuth';
+import { Info } from '@mui/icons-material';
 
 const AddInstructor = ({ onClose }) => {
   const [file, setFile] = useState(null);
@@ -22,6 +22,7 @@ const AddInstructor = ({ onClose }) => {
     about: '',
     img: ''
   });
+  const [errors, setErrors] = useState({});
 
   const { token } = useAuth()
 
@@ -43,21 +44,26 @@ const AddInstructor = ({ onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInstructor((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleSave = async () => {
+    let newErrors = {};
     if (!instructor.username) {
-      toast.error('User name required');
-      return;
+      newErrors.username = 'User name required';
     }
     if (!instructor.email) {
-      toast.error('Email required');
-      return;
+      newErrors.email = 'Email required';
     }
     if (!instructor.phone) {
-      toast.error('Phone number required');
+      newErrors.phone = 'Phone number required';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
+
     let imgUrl = ''
     if (file) {
       setImgUploading(true)
@@ -100,6 +106,8 @@ const AddInstructor = ({ onClose }) => {
             onChange={handleChange}
             fullWidth
             required
+            error={!!errors.username}
+            helperText={errors.username}
           />
         </Stack>
 
@@ -113,6 +121,8 @@ const AddInstructor = ({ onClose }) => {
             onChange={handleChange}
             fullWidth
             required
+            error={!!errors.email}
+            helperText={errors.email}
           />
           <CTextField
             topLabel="Phone Number"
@@ -122,6 +132,8 @@ const AddInstructor = ({ onClose }) => {
             value={instructor.phone}
             onChange={handleChange}
             required
+            error={!!errors.phone}
+            helperText={errors.phone}
           />
         </Stack>
 
@@ -144,6 +156,7 @@ const AddInstructor = ({ onClose }) => {
           rows={3}
         />
 
+        <ListItem disablePadding variant='caption'> <Info fontSize='small' color='primary' sx={{ mr: 1 }} /> A verification email will be sent with login password</ListItem>
         <CButton loading={mutation.isPending || imgUploading} contained onClick={handleSave}>
           Add Instructor
         </CButton>

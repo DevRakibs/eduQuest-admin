@@ -13,7 +13,6 @@ import { axiosReq } from '../../../../utils/axiosReq';
 import useAuth from '../../../hook/useAuth';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../utils/upload';
-import { useNavigate } from 'react-router-dom';
 
 Quill.register('modules/imageUploader', ImageUploader);
 
@@ -43,7 +42,7 @@ const quillModules = {
   }
 };
 
-const AddInfo = () => {
+const AddInfo = ({ onClose }) => {
   const [payload, setPayload] = useState({
     title: '',
     category: '',
@@ -77,8 +76,6 @@ const AddInfo = () => {
     queryFn: () => axiosReq.get('/instructor/all')
   })
 
-  const navigate = useNavigate();
-
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -86,7 +83,7 @@ const AddInfo = () => {
     onSuccess: (res) => {
       toast.success(res.data);
       queryClient.invalidateQueries(['course']);
-      navigate('/dashboard/course');
+      onClose();
     },
     onError: (error) => {
       toast.error(error.response.data);
@@ -160,11 +157,6 @@ const AddInfo = () => {
 
   return (
     <Stack maxWidth='md' flex={1.5} gap={2}>
-      <Typography variant='h6'>Course Info</Typography>
-      <Stack direction='row' justifyContent='space-between' my={1}>
-        <Box />
-        <CButton loading={mutation.isPending || imgUploading} onClick={handleSaveCourseInfo} contained>Save Course Info</CButton>
-      </Stack>
       <CTextField
         value={payload.title}
         onChange={e => setPayload({ ...payload, title: e.target.value })}
@@ -377,6 +369,7 @@ const AddInfo = () => {
           {errors.file && <Typography color="error" variant="caption">{errors.file}</Typography>}
         </Stack>
       </Stack>
+      <CButton loading={mutation.isPending || imgUploading} onClick={handleSaveCourseInfo} contained>Save Course Info</CButton>
     </Stack>
   );
 };

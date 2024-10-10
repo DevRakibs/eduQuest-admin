@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextField, Button, Box, IconButton, Typography, Collapse, Paper, Stack } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosReq } from '../../../../utils/axiosReq';
 import useAuth from '../../../hook/useAuth';
 
-const AddContent = ({ course, onClose }) => {
+const EditContent = ({ course, onClose }) => {
   const [sections, setSections] = useState([{ section: '', content: [{ title: '', description: '', url: '' }] }]);
   const [editingSection, setEditingSection] = useState(null);
   const [editingContent, setEditingContent] = useState(null);
@@ -115,6 +115,12 @@ const AddContent = ({ course, onClose }) => {
     mutation.mutate({ content: sections })
   };
 
+  useEffect(() => {
+    if (course) {
+      setSections(course.content)
+    }
+  }, [course])
+
   return (
     <Box maxWidth='md'>
       <Typography variant='h6'>Course Content</Typography>
@@ -145,7 +151,7 @@ const AddContent = ({ course, onClose }) => {
                 <IconButton color="primary" onClick={() => toggleEdit(sectionIndex, null)}><SaveIcon /></IconButton>
               </Box>
             ) : (
-              <Box display='flex' alignItems='center' mt={2}>
+              <Box display='flex' alignItems='center' gap={2} mt={2}>
                 <Typography variant="body1"><strong>Section:</strong> {section.section || 'No Section'}</Typography>
                 <IconButton color="primary" onClick={() => toggleEdit(sectionIndex, null)}><EditIcon fontSize='small' /></IconButton>
               </Box>
@@ -214,4 +220,4 @@ const AddContent = ({ course, onClose }) => {
   );
 };
 
-export default AddContent;
+export default EditContent;
