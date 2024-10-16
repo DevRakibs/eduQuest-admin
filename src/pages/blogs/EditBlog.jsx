@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box, Grid, Typography, MenuItem, Stack, IconButton, Avatar, Autocomplete } from '@mui/material';
+/* eslint-disable react/prop-types */
+import React, { useEffect, useState } from 'react';
+import { TextField, Button, Box, Grid, Typography, MenuItem, Stack, IconButton, Avatar, Autocomplete, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import CTextField from '../../common/CTextField';
 import CButton from '../../common/CButton';
@@ -12,7 +13,7 @@ import useAuth from '../../hook/useAuth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosReq } from '../../../utils/axiosReq';
 import toast from 'react-hot-toast';
-import { uploadImage } from '../../../utils/upload';
+import { deleteImage, uploadImage } from '../../../utils/upload';
 
 // Quill.register('modules/imageUploader', ImageUploader);
 
@@ -49,10 +50,11 @@ const modules = {
   // }
 };
 
-const AddBlog = ({ onClose }) => {
+const EditBlog = ({ onClose, data }) => {
   const [content, setContent] = useState('')
   const [file, setFile] = useState('')
   const [imgUploading, setImgUploading] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [payload, setPayload] = useState({
     title: '',
     category: '',
@@ -63,7 +65,7 @@ const AddBlog = ({ onClose }) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (input) => axiosReq.post('/blog/create', input, { headers: { Authorization: token } }),
+    mutationFn: (input) => axiosReq.put(`/blog/edit/${data._id}`, input, { headers: { Authorization: token } }),
     onSuccess: (res) => {
       toast.success(res.data);
       queryClient.invalidateQueries(['course']);
@@ -74,13 +76,27 @@ const AddBlog = ({ onClose }) => {
     }
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: () => axiosReq.delete(`/blog/delete/${data._id}`, { headers: { Authorization: token } }),
+    onSuccess: (res) => {
+      toast.success(res.data);
+      queryClient.invalidateQueries(['blog']);
+    },
+    onError: (error) => {
+      toast.error(error.response.data);
+    }
+  });
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPayload((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    if (!file) return toast.error('Image is required');
+  const publicId = data?.image?.split('/').pop().split('.')[0];
+
+
+  const handleSave = async () => {
     if (!payload.title) return toast.error('Title is required');
     if (!payload.category) return toast.error('Category is required');
     if (!content) return toast.error('Content is required');
@@ -88,28 +104,39 @@ const AddBlog = ({ onClose }) => {
     const blogData = {
       ...payload,
       content,
-      image: ''
+      image: data.image
     };
 
     if (file) {
       setImgUploading(true);
-      uploadImage(file)
-        .then(({ secure_url }) => {
-          blogData.image = secure_url;
-          mutation.mutate(blogData);
-        })
-        .finally(() => setImgUploading(false));
+      deleteImage(publicId)
+      const { secure_url } = await uploadImage(file);
+      blogData.image = secure_url;
+      mutation.mutate(blogData);
+      setImgUploading(false);
     } else {
       mutation.mutate(blogData);
     }
   };
+
+  const handleDeleteBlog = () => {
+    deleteMutation.mutate()
+    deleteImage(publicId)
+    setDeleteDialogOpen(false)
+    onClose()
+  }
+
+  useEffect(() => {
+    setPayload(data)
+    setContent(data.content)
+  }, [data])
 
   return (
     <Box>
 
       <Stack gap={2}>
         <Stack direction="row" gap={2} alignItems="center">
-          <Avatar src={file ? URL.createObjectURL(file) : ''} />
+          <Avatar src={file ? URL.createObjectURL(file) : data?.image} />
           <input onChange={e => setFile(e.target.files[0])} accept="image/*" hidden id="file" type="file" />
           <label htmlFor="file">
             <Button size='small' component="span">
@@ -145,11 +172,27 @@ const AddBlog = ({ onClose }) => {
         </Stack>
 
         <CButton loading={mutation.isPending || imgUploading} contained onClick={handleSave}>
-          Create
+          Update
         </CButton>
+        <CButton style={{ alignSelf: 'flex-start' }} color='error' loading={deleteMutation.isPending} onClick={() => setDeleteDialogOpen(true)}>
+          Delete this blog
+        </CButton>
+
+        {/* delete dialog */}
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+          <DialogTitle>Delete Blog</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Are you sure you want to delete this blog?</DialogContentText>
+            <DialogContentText color='error'>This action cannot be undone.</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <CButton onClick={() => setDeleteDialogOpen(false)}>Cancel</CButton>
+            <CButton loading={deleteMutation.isPending} onClick={handleDeleteBlog} color="error">Delete</CButton>
+          </DialogActions>
+        </Dialog>
       </Stack>
     </Box >
   );
 };
 
-export default AddBlog;
+export default EditBlog;

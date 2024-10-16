@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { axiosReq } from '../../../../utils/axiosReq'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Typography, Grid, Card, CardContent, CardMedia, List, ListItem, ListItemText, Chip, Divider, Stack, Tabs, Tab } from '@mui/material'
@@ -12,10 +12,12 @@ import Loader from '../../../common/Loader'
 import ErrorMsg from '../../../common/ErrorMsg'
 import ContentDetails from './ContentDetails'
 import EnrolledStudent from './EnrolledStudent'
-
+import useAuth from '../../../hook/useAuth'
 const CourseDetails = () => {
   const [value, setValue] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+  const { token } = useAuth()
 
   const handleDialog = () => setEditDialogOpen(false)
 
@@ -28,6 +30,15 @@ const CourseDetails = () => {
     queryFn: () => axiosReq.get(`/course/${id}`)
   })
 
+  const { data: contentData, } = useQuery({
+    queryKey: ['content', course?.data?._id],
+    queryFn: async () => {
+      const response = await axiosReq.get(`/course/content/${id}`, { headers: { Authorization: token } });
+      return response.data;
+    },
+  });
+
+  console.log(contentData)
   if (isLoading) return <Loader />
   if (isError) return <ErrorMsg />
   return (
@@ -51,6 +62,13 @@ const CourseDetails = () => {
               {course?.data.title}
             </Typography>
 
+            <Typography sx={{ mb: 2, border: '1px solid #e0e0e0', p: 1.5, borderRadius: '8px', width: 'fit-content' }}>
+              <Link to={`/dashboard/instructor/${course?.data.instructor._id}`}>
+                @{course?.data.instructor.username} <br />
+              </Link>
+              Email: {course?.data.instructor.email}
+            </Typography>
+
             <Typography variant="h6" sx={{ mb: 1, color: '#1976d2' }}>
               Price: ৳{course?.data.price}
             </Typography>
@@ -70,7 +88,7 @@ const CourseDetails = () => {
               ))}
             </Stack>
 
-            <Chip sx={{ mt: 2, px: 3 }} label={course?.data.status} color={course?.data.status === 'active' ? 'success' : 'warning'} />
+            <Chip sx={{ mt: 2, px: 3 }} label={course?.data.status} color={course?.data.status === 'active' ? 'success' : course?.data.status === 'pending' ? 'warning' : 'default'} />
           </CardContent>
         </Grid>
       </Grid>
@@ -79,7 +97,7 @@ const CourseDetails = () => {
 
       <Tabs value={value} onChange={handleChange}>
         <Tab label="Course Info" />
-        <Tab label="Course Content" />
+        <Tab label={`Course Content (${contentData?.sections?.length || 0})`} />
         <Tab label={`Enrolled Student (${course?.data.studentsEnrolled.length})`} />
       </Tabs>
 

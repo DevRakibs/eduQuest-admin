@@ -55,10 +55,6 @@ const AddCategory = ({ onClose }) => {
       toast.error('Please write a category name')
       return
     }
-    if (description === '') {
-      toast.error('Please write a description')
-      return
-    }
     let imgUrl = ''
     if (file) {
       setImgUploading(true)

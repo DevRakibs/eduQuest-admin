@@ -66,9 +66,9 @@ const EnrolledStudent = ({ course }) => {
             <Typography sx={{
               color: params.row.enrollmentStatus === 'approved' ?
                 'success.main' : params.row.enrollmentStatus === 'pending' ? 'warning.main' : '',
-              border: params.row.enrollmentStatus === 'pending' ? '1px solid red' : params.row.enrollmentStatus === 'approved' ? '1px solid green' : '',
+              // border: params.row.enrollmentStatus === 'pending' ? '1px solid red' : params.row.enrollmentStatus === 'approved' ? '1px solid green' : '',
               borderRadius: '4px',
-              padding: '4px 8px',
+              padding: '2px 20px',
               fontWeight: 'bold',
               width: 'fit-content'
             }}>{params.row.enrollmentStatus}</Typography>
@@ -84,13 +84,13 @@ const EnrolledStudent = ({ course }) => {
         return (
           <Stack height='100%' justifyContent='center'>
             <Typography sx={{
-              bgcolor: params.row.paymentStatus === 'confirmed' ?
-                'success.main' : params.row.paymentStatus === 'pending' ? 'warning.main' : '',
+              bgcolor: params.row.paymentStatus === 'paid' ?
+                'success.main' : params.row.paymentStatus === 'unpaid' ? 'warning.main' : '',
               color: 'white',
               borderRadius: '4px',
-              padding: '4px 8px',
+              padding: '2px 20px',
               fontWeight: 'bold',
-              width: 'fit-content'
+              width: 'fit-content',
             }}>{params.row.paymentStatus}</Typography>
           </Stack>
         )
@@ -116,7 +116,7 @@ const EnrolledStudent = ({ course }) => {
       <Stack direction={{ xs: 'column', md: 'row' }} gap={2} alignItems='center' justifyContent='space-between'>
         <Box>
           <Typography variant='h5'>Enrollment List</Typography>
-          <Typography variant='body2'>Total Enrollments (10)</Typography>
+          <Typography variant='body2'>Total Enrollments ({course?.studentsEnrolled?.length})</Typography>
         </Box>
         <CButton onClick={handleAddDialog} contained startIcon={<Add />} >Enroll a Student</CButton>
       </Stack>

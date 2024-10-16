@@ -69,13 +69,13 @@ function Layout() {
           </IconButton>
           <Box />
           <Stack direction='row' alignItems='center' gap={2}>
-            <Link to='notifications'>
+            {/* <Link to='notifications'>
               <IconButton>
                 <Badge badgeContent={9} color='warning'>
                   <NotificationsNone />
                 </Badge>
               </IconButton>
-            </Link>
+            </Link> */}
             <ClickAwayListener onClickAway={() => setUserMenuOpen(false)}>
               <Stack onClick={() => setUserMenuOpen(p => !p)} sx={{ cursor: 'pointer', userSelect: 'none' }} direction='row' gap={1}>
                 <Avatar src={user?.img ?? ''} />

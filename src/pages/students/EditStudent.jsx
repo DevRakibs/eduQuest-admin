@@ -17,6 +17,7 @@ const EditStudent = ({ data, onClose }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [payload, setPayload] = useState({
     name: '',
+    username: '',
     phone: '',
     address: '',
     about: '',
@@ -133,17 +134,30 @@ const EditStudent = ({ data, onClose }) => {
             required
           />
           <CTextField
-            topLabel="Phone Number"
+            topLabel="User Name"
             size='small'
-            name="phone"
-            variant="outlined"
-            value={payload.phone}
+            name="username"
+            value={payload.username}
             onChange={handleChange}
+            fullWidth
             required
-            error={!!errors.phone}
-            helperText={errors.phone}
+            error={!!errors.username}
+            helperText={errors.username}
           />
+
         </Stack>
+
+        <CTextField
+          topLabel="Phone Number"
+          size='small'
+          name="phone"
+          variant="outlined"
+          value={payload.phone}
+          onChange={handleChange}
+          required
+          error={!!errors.phone}
+          helperText={errors.phone}
+        />
 
         <CTextField
           topLabel="Address"

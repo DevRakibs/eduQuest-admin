@@ -16,7 +16,7 @@ const CDrawer = ({ handleDrawerClose }) => {
 
   const links = [
     { name: 'Dashboard', icon: <GridViewOutlined />, path: '', end: true },
-    { name: 'Notifications', icon: <NotificationsNoneOutlined />, path: 'notification', notification: 21 },
+    // { name: 'Notifications', icon: <NotificationsNoneOutlined />, path: 'notification', notification: 21 },
     {
       name: 'Courses', icon: <ListAlt />, more: [
         { name: 'Course List', path: 'course', end: true },

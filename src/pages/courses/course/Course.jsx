@@ -1,4 +1,4 @@
-import { Add, DeleteOutline, Edit, EditOutlined, MoreVert, Search } from '@mui/icons-material'
+import { Add, DeleteOutline, Edit, EditOutlined, LibraryAddCheck, LibraryAddCheckOutlined, MoreVert, Search } from '@mui/icons-material'
 import { Avatar, Box, Chip, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import CButton from '../../../common/CButton'
@@ -15,31 +15,42 @@ import UpdateCourse from './UpdateCourse';
 
 const Course = () => {
   const [category, setCategory] = useState('');
+  const [search, setSearch] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [course, setCourse] = useState(null);
+  const [editCourseData, setEditCourseData] = useState(null);
+
+  const { data: categories } = useQuery({
+    queryKey: ['category'],
+    queryFn: () => axiosReq.get('/category/all'),
+  })
 
   const { data: courses, isLoading } = useQuery({
-    queryKey: ['course'],
-    queryFn: () => axiosReq.get('/course/all')
+    queryKey: ['course', category, search],
+    queryFn: () => axiosReq.get('/course/all', {
+      params: {
+        category: category,
+        search: search
+      }
+    })
   })
 
   function handleEdit(course) {
     setEditDialogOpen(true);
-    setCourse(course);
+    setEditCourseData(course);
   }
 
   const handleDialog = () => setEditDialogOpen(false)
 
   const columns = [
-    {
-      field: 'id', headerName: 'ID', width: 100,
-      renderCell: (params) => <Link
-        style={{ textDecoration: 'none' }}
-        to={`${params.row._id}`}>
-        # {params.row._id}
-      </Link>
-    },
+    // {
+    //   field: 'id', headerName: 'ID', width: 100,
+    //   renderCell: (params) => <Link
+    //     style={{ textDecoration: 'none' }}
+    //     to={`${params.row._id}`}>
+    //     # {params.row._id}
+    //   </Link>
+    // },
     {
       field: 'course',
       headerName: 'Course',
@@ -48,7 +59,9 @@ const Course = () => {
         <Box display="flex" alignItems="center" height='100%'>
           <Avatar src={params.row.cover || '/no-image.png'} sx={{ borderRadius: '4px', mr: 1 }} />
           <Box>
-            <Typography>{params.row.title}</Typography>
+            <Link to={`${params.row._id}`}>
+              <Typography>{params.row.title}</Typography>
+            </Link>
             <Typography variant='body2' color='text.secondary'>{params.row.category.name}</Typography>
           </Box>
         </Box>
@@ -63,7 +76,7 @@ const Course = () => {
         <Box display="flex" alignItems="center" height='100%'>
           <Avatar src={params.row.instructor.img ?? ''} sx={{ mr: 1 }} />
           <Box>
-            <Link to={`/instructor/${params.row.instructor._id}`} style={{ textDecoration: 'none' }}>
+            <Link to={`dashboard/instructor/${params.row.instructor._id}`} style={{ textDecoration: 'none' }}>
               <Typography>{params.row.instructor.username}</Typography>
             </Link>
             <Typography variant='body2' color='text.secondary'>{params.row.instructor.email}</Typography>
@@ -99,7 +112,17 @@ const Course = () => {
       headerName: 'Status',
       width: 150,
       renderCell: (params) => (
-        <Chip label={params.row.status} color={params.row.status === 'active' ? 'success' : 'warning'} />
+        <Chip label={params.row.status} color={params.row.status === 'active' ? 'success' : params.row.status === 'pending' ? 'warning' : 'default'} />
+      ),
+    },
+    {
+      field: 'content',
+      headerName: 'Content',
+      width: 150,
+      renderCell: (params) => (
+        <Stack height='100%' justifyContent='center'>
+          {params.row?.content ? <LibraryAddCheck color='success' /> : <LibraryAddCheckOutlined color='disabled' />}
+        </Stack>
       ),
     },
 
@@ -117,7 +140,6 @@ const Course = () => {
     },
   ];
 
-
   return (
     <Box maxWidth='1600px'>
       <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between'>
@@ -129,16 +151,18 @@ const Course = () => {
         <Stack direction='row' gap={2} justifyContent='space-between' alignItems='center'>
           <Box sx={{ minWidth: 120 }} >
             <FormControl fullWidth size='small'>
-              <InputLabel>Category</InputLabel>
+              <InputLabel>Filter</InputLabel>
               <Select
                 value={category}
-                label="Category"
+                label="Filter"
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <MenuItem value={10}>None</MenuItem>
-                <MenuItem value={10}>Web Development</MenuItem>
-                <MenuItem value={20}>Graphic Design</MenuItem>
-                <MenuItem value={30}>Marketing</MenuItem>
+                <MenuItem value={''}>None</MenuItem>
+                {
+                  categories?.data?.map(c => (
+                    <MenuItem key={c._id} value={c._id}>{c.name}</MenuItem>
+                  ))
+                }
               </Select>
             </FormControl>
           </Box>
@@ -148,6 +172,7 @@ const Course = () => {
 
       <Box mt={3} mb={2}>
         <TextField
+          onChange={(e) => setSearch(e.target.value)}
           size="small"
           placeholder="Search Course..."
           InputProps={{
@@ -173,7 +198,7 @@ const Course = () => {
 
       {/* Update course */}
       <CDialog maxWidth='md' open={editDialogOpen} title='Update Course' onClose={handleDialog}>
-        <UpdateCourse course={course} onClose={handleDialog} />
+        <UpdateCourse course={editCourseData} onClose={handleDialog} />
       </CDialog>
 
       {/* add course */}

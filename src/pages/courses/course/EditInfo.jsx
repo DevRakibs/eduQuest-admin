@@ -66,7 +66,6 @@ const EditInfo = ({ course, onClose }) => {
   const [includesInCourseSecOpen, setIncludesInCourseSecOpen] = useState(false);
   const [includesTitle, setIncludesTitle] = useState('');
   const [imgUploading, setImgUploading] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { token } = useAuth()
 
@@ -90,18 +89,7 @@ const EditInfo = ({ course, onClose }) => {
     }
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: () => axiosReq.delete(`/course/delete/${course._id}`, { headers: { Authorization: token } }),
-    onSuccess: (res) => {
-      toast.success(res.data);
-      queryClient.invalidateQueries(['course']);
-      setDeleteDialogOpen(false);
-      onClose();
-    },
-    onError: (error) => {
-      toast.error(error.response.data);
-    }
-  });
+
   const handleAddBatch = () => {
     if (batchInfoPayload.title && batchInfoPayload.description) {
       setBatchInfo([...batchInfo, { ...batchInfoPayload }]);
@@ -167,12 +155,6 @@ const EditInfo = ({ course, onClose }) => {
     }
   }
 
-  const handleDeleteCourse = () => {
-    deleteMutation.mutate();
-    deleteImage(publicId)
-    onClose();
-  }
-
   useEffect(() => {
     setPayload({
       title: course.title ?? '',
@@ -188,179 +170,178 @@ const EditInfo = ({ course, onClose }) => {
   }, [course]);
 
   return (
-    <>
-      <Stack gap={2}>
+    <Stack gap={2}>
 
-        <Box display="flex" alignItems="center">
-          <Avatar src={course?.instructor?.img || '/no-image.png'} sx={{ borderRadius: '4px', mr: 1 }} />
-          <Box>
-            <Link to={`/instructor/${instructor?._id}`} style={{ textDecoration: 'none' }}>
-              <Typography>{instructor?.username}</Typography>
-            </Link>
-            <Typography variant='body2' color='text.secondary'>{instructor?.email}</Typography>
-          </Box>
+      <Box display="flex" alignItems="center">
+        <Avatar src={course?.instructor?.img || '/no-image.png'} sx={{ borderRadius: '4px', mr: 1 }} />
+        <Box>
+          <Link to={`/instructor/${instructor?._id}`} style={{ textDecoration: 'none' }}>
+            <Typography>{instructor?.username}</Typography>
+          </Link>
+          <Typography variant='body2' color='text.secondary'>{instructor?.email}</Typography>
         </Box>
+      </Box>
 
-        <CTextField
-          value={payload.title}
-          onChange={e => setPayload({ ...payload, title: e.target.value })}
-          size='small'
-          topLabel='Title'
-          error={!!errors.title}
-          helperText={errors.title}
-        />
-        <FormControl size='small' fullWidth error={!!errors.category}>
-          <label>Category</label>
-          <Select
-            value={payload.category || ''}
-            onChange={e => setPayload({ ...payload, category: e.target.value })}
-          >
-            {
-              categories?.data.map(category => (
-                <MenuItem key={category._id} value={category._id ?? ''}>{category.name}</MenuItem>
-              ))
-            }
-          </Select>
-          {errors.category && <Typography color="error" variant="caption">{errors.category}</Typography>}
-        </FormControl>
-
-        <CTextField
-          value={payload.price}
-          onChange={e => setPayload({ ...payload, price: e.target.value })}
-          type='number'
-          size='small'
-          topLabel='Price'
-          error={!!errors.price}
-          helperText={errors.price}
-        />
-        <Stack direction='row' gap={2}>
-          <CTextField
-            value={payload.startDate}
-            onChange={e => setPayload({ ...payload, startDate: e.target.value })}
-            size='small'
-            type='date'
-            topLabel='Start Date'
-            error={!!errors.startDate}
-            helperText={errors.startDate}
-          />
-          <CTextField
-            value={payload.endDate}
-            onChange={e => setPayload({ ...payload, endDate: e.target.value })}
-            size='small'
-            type='date'
-            topLabel='End Date'
-            error={!!errors.endDate}
-            helperText={errors.endDate}
-          />
-        </Stack>
-
-        {/* Add Batch Information */}
-        <CollapsibleSection
-          title="Batch Information"
-          isOpen={addBatchInfoSecOpen}
-          setIsOpen={setAddBatchInfoSecOpen}
+      <CTextField
+        value={payload.title}
+        onChange={e => setPayload({ ...payload, title: e.target.value })}
+        size='small'
+        topLabel='Title'
+        error={!!errors.title}
+        helperText={errors.title}
+      />
+      <FormControl size='small' fullWidth error={!!errors.category}>
+        <label>Category</label>
+        <Select
+          value={payload.category || ''}
+          onChange={e => setPayload({ ...payload, category: e.target.value })}
         >
-          <CTextField
-            size='small'
-            fullWidth
-            topLabel="Title"
-            value={batchInfoPayload.title}
-            onChange={e => setBatchInfoPayload({ ...batchInfoPayload, title: e.target.value })}
-          />
-          <CTextField
-            sx={{ mb: 2 }}
-            size='small'
-            fullWidth
-            topLabel="Description"
-            value={batchInfoPayload.description}
-            onChange={e => setBatchInfoPayload({ ...batchInfoPayload, description: e.target.value })}
-          />
-          <CButton
-            outlined
-            fullWidth
-            startIcon={<Add />}
-            onClick={handleAddBatch}
-          >
-            Add
-          </CButton>
-          <Box>
-            {batchInfo.map((batch, index) => (
-              <InfoItem
-                key={index}
-                title={batch.title}
-                description={batch.description}
-                onDelete={() => handleDeleteBatch(index)}
-              />
-            ))}
-          </Box>
-          {errors.batchInfo && <Typography color="error" variant="caption">{errors.batchInfo}</Typography>}
-        </CollapsibleSection>
+          {
+            categories?.data.map(category => (
+              <MenuItem key={category._id} value={category._id ?? ''}>{category.name}</MenuItem>
+            ))
+          }
+        </Select>
+        {errors.category && <Typography color="error" variant="caption">{errors.category}</Typography>}
+      </FormControl>
 
-        {/* include in course */}
-        <CollapsibleSection
-          title="Includes in Course"
-          isOpen={includesInCourseSecOpen}
-          setIsOpen={setIncludesInCourseSecOpen}
+      <CTextField
+        value={payload.price}
+        onChange={e => setPayload({ ...payload, price: e.target.value })}
+        type='number'
+        size='small'
+        topLabel='Price'
+        error={!!errors.price}
+        helperText={errors.price}
+      />
+      <Stack direction='row' gap={2}>
+        <CTextField
+          value={payload.startDate}
+          onChange={e => setPayload({ ...payload, startDate: e.target.value })}
+          size='small'
+          type='date'
+          topLabel='Start Date'
+          error={!!errors.startDate}
+          helperText={errors.startDate}
+        />
+        <CTextField
+          value={payload.endDate}
+          onChange={e => setPayload({ ...payload, endDate: e.target.value })}
+          size='small'
+          type='date'
+          topLabel='End Date'
+          error={!!errors.endDate}
+          helperText={errors.endDate}
+        />
+      </Stack>
+
+      {/* Add Batch Information */}
+      <CollapsibleSection
+        title="Batch Information"
+        isOpen={addBatchInfoSecOpen}
+        setIsOpen={setAddBatchInfoSecOpen}
+      >
+        <CTextField
+          size='small'
+          fullWidth
+          topLabel="Title"
+          value={batchInfoPayload.title}
+          onChange={e => setBatchInfoPayload({ ...batchInfoPayload, title: e.target.value })}
+        />
+        <CTextField
+          sx={{ mb: 2 }}
+          size='small'
+          fullWidth
+          topLabel="Description"
+          value={batchInfoPayload.description}
+          onChange={e => setBatchInfoPayload({ ...batchInfoPayload, description: e.target.value })}
+        />
+        <CButton
+          outlined
+          fullWidth
+          startIcon={<Add />}
+          onClick={handleAddBatch}
         >
-          <CTextField
-            size='small'
-            fullWidth
-            topLabel="Title"
-            value={includesTitle}
-            onChange={e => setIncludesTitle(e.target.value)}
-          />
-          <CButton
-            sx={{ mt: 2 }}
-            outlined
-            startIcon={<Add />}
-            onClick={handleAddIncludes}
-          >
-            Add
-          </CButton>
-          <Box>
-            {includes.map((item, index) => (
-              <InfoItem
-                key={index}
-                title={item}
-                onDelete={() => handleDeleteIncludes(index)}
-              />
-            ))}
-          </Box>
-          {errors.includes && <Typography color="error" variant="caption">{errors.includes}</Typography>}
-        </CollapsibleSection>
+          Add
+        </CButton>
+        <Box>
+          {batchInfo.map((batch, index) => (
+            <InfoItem
+              key={index}
+              title={batch.title}
+              description={batch.description}
+              onDelete={() => handleDeleteBatch(index)}
+            />
+          ))}
+        </Box>
+        {errors.batchInfo && <Typography color="error" variant="caption">{errors.batchInfo}</Typography>}
+      </CollapsibleSection>
 
-        <Stack mb={{ xs: 5, md: 0 }}>
-          <label>Description</label>
-          <ReactQuill
-            style={{ height: '400px', marginBottom: '50px', borderRadius: '8px' }}
-            value={description}
-            onChange={(e) => setDescription(e)}
-            modules={quillModules}
-            formats={['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'link', 'image', 'video']}
-            placeholder="Write Description here..."
-          />
-          {errors.description && <Typography color="error" variant="caption">{errors.description}</Typography>}
-        </Stack>
+      {/* include in course */}
+      <CollapsibleSection
+        title="Includes in Course"
+        isOpen={includesInCourseSecOpen}
+        setIsOpen={setIncludesInCourseSecOpen}
+      >
+        <CTextField
+          size='small'
+          fullWidth
+          topLabel="Title"
+          value={includesTitle}
+          onChange={e => setIncludesTitle(e.target.value)}
+        />
+        <CButton
+          sx={{ mt: 2 }}
+          outlined
+          startIcon={<Add />}
+          onClick={handleAddIncludes}
+        >
+          Add
+        </CButton>
+        <Box>
+          {includes.map((item, index) => (
+            <InfoItem
+              key={index}
+              title={item}
+              onDelete={() => handleDeleteIncludes(index)}
+            />
+          ))}
+        </Box>
+        {errors.includes && <Typography color="error" variant="caption">{errors.includes}</Typography>}
+      </CollapsibleSection>
 
-        <Stack>
-          <Typography>Course Image</Typography>
-          <Stack sx={{
-            position: 'relative',
-            border: '1px solid lightgray',
-            p: '20px',
-            borderRadius: '8px',
-            minHeight: '200px'
-          }} direction={{ xs: 'column', md: 'row' }} gap={3}>
-            {(file || course?.cover) && (
-              <>
-                <Box flex={1}>
-                  <img
-                    style={{ width: '100%', height: '180px', objectFit: 'cover' }}
-                    src={file ? URL.createObjectURL(file) : course?.cover}
-                    alt=""
-                  />
-                </Box>
-                {/* <IconButton
+      <Stack mb={{ xs: 5, md: 0 }}>
+        <label>Description</label>
+        <ReactQuill
+          style={{ height: '400px', marginBottom: '50px', borderRadius: '8px' }}
+          value={description}
+          onChange={(e) => setDescription(e)}
+          modules={quillModules}
+          formats={['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'link', 'image', 'video']}
+          placeholder="Write Description here..."
+        />
+        {errors.description && <Typography color="error" variant="caption">{errors.description}</Typography>}
+      </Stack>
+
+      <Stack>
+        <Typography>Course Image</Typography>
+        <Stack sx={{
+          position: 'relative',
+          border: '1px solid lightgray',
+          p: '20px',
+          borderRadius: '8px',
+          minHeight: '200px'
+        }} direction={{ xs: 'column', md: 'row' }} gap={3}>
+          {(file || course?.cover) && (
+            <>
+              <Box flex={1}>
+                <img
+                  style={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                  src={file ? URL.createObjectURL(file) : course?.cover}
+                  alt=""
+                />
+              </Box>
+              {/* <IconButton
                 onClick={() => setFile(null)}
                 sx={{
                   position: 'absolute',
@@ -375,34 +356,20 @@ const EditInfo = ({ course, onClose }) => {
               >
                 <Close />
               </IconButton> */}
-              </>
-            )}
-            <Stack alignItems='center' justifyContent='center' gap={1} flex={1}>
-              <Typography>jpg, png (max 500kb)</Typography>
-              <Button variant='outlined' component='label' startIcon={<Upload />}>
-                Click to upload
-                <input onChange={e => setFile(e.target.files[0])} type="file" hidden />
-              </Button>
-            </Stack>
-            {errors.file && <Typography color="error" variant="caption">{errors.file}</Typography>}
+            </>
+          )}
+          <Stack alignItems='center' justifyContent='center' gap={1} flex={1}>
+            <Typography>jpg, png (max 500kb)</Typography>
+            <Button variant='outlined' component='label' startIcon={<Upload />}>
+              Click to upload
+              <input onChange={e => setFile(e.target.files[0])} type="file" hidden />
+            </Button>
           </Stack>
+          {errors.file && <Typography color="error" variant="caption">{errors.file}</Typography>}
         </Stack>
-        <CButton loading={updateMutation.isPending || imgUploading} onClick={handleSaveCourseInfo} contained>Update Course Info</CButton>
       </Stack>
-      <CButton onClick={() => setDeleteDialogOpen(true)} style={{ mt: 2 }} color='error' >Delete this Course</CButton>
-      {/* delete dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Course</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Are you sure you want to delete this course?</DialogContentText>
-          <DialogContentText color='error'>This action cannot be undone.</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <CButton onClick={() => setDeleteDialogOpen(false)}>Cancel</CButton>
-          <CButton loading={deleteMutation.isPending} onClick={handleDeleteCourse} color="error">Delete</CButton>
-        </DialogActions>
-      </Dialog>
-    </>
+      <CButton loading={updateMutation.isPending || imgUploading} onClick={handleSaveCourseInfo} contained>Update Course Info</CButton>
+    </Stack>
   );
 };
 

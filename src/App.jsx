@@ -20,6 +20,7 @@ import useAuth from './hook/useAuth'
 import ForgotePass from './pages/forgotePass/ForgotePass'
 import PasswordReset from './pages/password-reset/PasswordReset'
 import CourseDetails from './pages/courses/course/CourseDetails'
+import StudentDetails from './pages/students/StudentDetails'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -53,6 +54,7 @@ function App() {
           <Route path='instructor' element={<Instructors />} />
           <Route path='instructor/:id' element={<InstructorDetails />} />
           <Route path='student' element={<Students />} />
+          <Route path='student/:id' element={<StudentDetails />} />
           <Route path='enrolment' element={<Enrolment />} />
           <Route path='resourse' element={<Resourse />} />
           <Route path='blog' element={<Blogs />} />

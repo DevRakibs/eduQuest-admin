@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField, Button, Box, Grid, Typography, MenuItem, Stack, IconButton, Avatar, Autocomplete } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import CTextField from '../../common/CTextField';
@@ -8,7 +8,7 @@ import { axiosReq } from '../../../utils/axiosReq';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useAuth from '../../hook/useAuth';
 
-const AddResourse = ({ onClose }) => {
+const EditResourse = ({ onClose, resourse }) => {
   const [payload, setPayload] = useState({
     name: '',
     url: '',
@@ -22,7 +22,7 @@ const AddResourse = ({ onClose }) => {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (input) => axiosReq.post('/resourse/create', input, { headers: { Authorization: token } }),
+    mutationFn: (input) => axiosReq.put(`/resourse/update/${resourse._id}`, input, { headers: { Authorization: token } }),
     onSuccess: (res) => {
       toast.success(res.data);
       queryClient.invalidateQueries(['resourse'])
@@ -44,6 +44,12 @@ const AddResourse = ({ onClose }) => {
     if (!payload.category) return toast.error('category required')
     mutation.mutate(payload)
   };
+
+  useEffect(() => {
+    if (resourse) {
+      setPayload(resourse)
+    }
+  }, [resourse])
 
   return (
     <Box>
@@ -70,6 +76,7 @@ const AddResourse = ({ onClose }) => {
           topLabel="Version"
           size='small'
           name="version"
+          type='number'
           value={payload.version}
           onChange={handleChange}
           fullWidth
@@ -87,7 +94,6 @@ const AddResourse = ({ onClose }) => {
           topLabel="Total Files"
           size='small'
           name="files"
-          type='number'
           value={payload.files}
           onChange={handleChange}
           fullWidth
@@ -102,4 +108,4 @@ const AddResourse = ({ onClose }) => {
   );
 };
 
-export default AddResourse;
+export default EditResourse;

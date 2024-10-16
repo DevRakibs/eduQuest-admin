@@ -19,6 +19,7 @@ const EditInstructor = ({ data, onClose }) => {
 
   const [instructor, setInstructor] = useState({
     name: '',
+    username: '',
     phone: '',
     address: '',
     about: '',
@@ -126,7 +127,15 @@ const EditInstructor = ({ data, onClose }) => {
             onChange={handleChange}
             required
           />
-
+          <CTextField
+            topLabel="User Name"
+            size='small'
+            name="username"
+            value={instructor.username}
+            onChange={handleChange}
+            fullWidth
+            required
+          />
         </Stack>
 
         <Stack direction={{ xs: 'column', md: 'row' }} gap={2}>

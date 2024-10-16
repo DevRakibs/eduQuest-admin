@@ -1,4 +1,4 @@
-import { Add, DeleteOutline, Edit, EditOutlined, MoreVert, PhoneOutlined, Search } from '@mui/icons-material'
+import { Add, DeleteOutline, DoneAll, Edit, EditOutlined, MoreVert, PhoneOutlined, Search } from '@mui/icons-material'
 import { Avatar, Box, Chip, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import CButton from '../../common/CButton'
@@ -27,10 +27,11 @@ const Students = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editData, setEditData] = useState(null)
+  const [search, setSearch] = useState('');
 
   const { data: students, isLoading } = useQuery({
-    queryKey: ['student'],
-    queryFn: () => axiosReq.get('/student/all'),
+    queryKey: ['student', search],
+    queryFn: () => axiosReq.get('/student/all', { params: { search } }),
   })
 
   const closeAddDialog = () => setAddDialogOpen(false)
@@ -39,7 +40,7 @@ const Students = () => {
     setEditDialogOpen(true)
     setEditData(row)
   }
-
+  console.log(students)
   const columns = [
     // { field: 'id', headerName: 'ID', width: 100 },
     {
@@ -50,7 +51,7 @@ const Students = () => {
         <Stack gap={1} direction='row' alignItems='center' height='100%'>
           <Avatar src={params.row.img ?? ''} />
           <Box>
-            <Link to={`/student/${params.row._id}`} style={{ textDecoration: 'none' }}>
+            <Link to={`/dashboard/student/${params.row._id}`} style={{ textDecoration: 'none' }}>
               <Typography sx={{ fontWeight: 600 }}>@{params.row.username}</Typography>
             </Link>
             <Typography>{params.row.email}</Typography>
@@ -74,8 +75,10 @@ const Students = () => {
       headerName: 'Enrolled Course',
       width: 200,
       renderCell: (params) => (
-        <Stack justifyContent='center' height='100%'>
-          <Typography sx={{ fontWeight: 600 }}>{params.row.enrolledCourses?.length}</Typography>
+        <Stack alignItems='center' direction='row' height='100%'>
+          <Typography sx={{ fontWeight: 600, fontSize: 18, color: 'primary.main' }}>
+            {params.row.enrolledCourses?.length}
+          </Typography>
         </Stack>
       ),
     },
@@ -138,6 +141,7 @@ const Students = () => {
       <Box mt={3} mb={2}>
         <TextField
           size="small"
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search students..."
           InputProps={{
             startAdornment: (

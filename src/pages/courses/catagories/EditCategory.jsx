@@ -72,10 +72,6 @@ const EditCategory = ({ onClose, category }) => {
       toast.error('Please write a category name')
       return
     }
-    if (description === '') {
-      toast.error('Please write a description')
-      return
-    }
     let imgUrl = category?.img
     if (file) {
       setImgUploading(true)

@@ -41,7 +41,7 @@ const DataTable = ({
       sx={{ width: { xs: '96vw', md: '100%' } }}
     >
       <DataGrid
-        sx={{ bgcolor: '#fff', }}
+        sx={{ bgcolor: '#fff' }}
         rows={rows}
         columns={columns}
         autoHeight

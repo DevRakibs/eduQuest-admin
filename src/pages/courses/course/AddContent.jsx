@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
-import { TextField, Button, Box, IconButton, Typography, Collapse, Paper, Stack } from '@mui/material';
+import { TextField, Button, Box, IconButton, Typography, Collapse, Paper, Stack, MenuItem, Select, FormControlLabel, Checkbox } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,7 +14,22 @@ import { axiosReq } from '../../../../utils/axiosReq';
 import useAuth from '../../../hook/useAuth';
 
 const AddContent = ({ course, onClose }) => {
-  const [sections, setSections] = useState([{ section: '', content: [{ title: '', description: '', url: '' }] }]);
+  const [sections, setSections] = useState([{
+    title: '',
+    description: '',
+    order: 1,
+    content: [{
+      title: '',
+      description: '',
+      type: 'video',
+      url: '',
+      duration: 0,
+      fileSize: 0,
+      isOptional: false,
+      order: 1
+    }],
+    estimatedDuration: 0
+  }]);
   const [editingSection, setEditingSection] = useState(null);
   const [editingContent, setEditingContent] = useState(null);
   const [openSection, setOpenSection] = useState(null);
@@ -25,10 +40,10 @@ const AddContent = ({ course, onClose }) => {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (input) => axiosReq.put(`/course/update-content/${course._id}`, input, { headers: { Authorization: token } }),
+    mutationFn: (input) => axiosReq.post(`/course/create/content/${course._id}`, input, { headers: { Authorization: token } }),
     onSuccess: (res) => {
       toast.success(res.data);
-      queryClient.invalidateQueries(['course']);
+      queryClient.invalidateQueries(['content', course._id]);
       onClose()
     },
     onError: (error) => {
@@ -37,11 +52,26 @@ const AddContent = ({ course, onClose }) => {
   });
 
   const addSection = () => {
-    if (sections[sections.length - 1].section.trim() === '') {
-      toast.error('Please fill in the section for the current section before adding a new one.');
+    if (sections[sections.length - 1].title.trim() === '') {
+      toast.error('Please fill in the title for the current section before adding a new one.');
       return;
     }
-    setSections([...sections, { section: '', content: [{ title: '', description: '', url: '' }] }]);
+    setSections([...sections, {
+      title: '',
+      description: '',
+      order: sections.length + 1,
+      content: [{
+        title: '',
+        description: '',
+        type: 'video',
+        url: '',
+        duration: 0,
+        // fileSize: 0,
+        isOptional: false,
+        order: 1
+      }],
+      estimatedDuration: 0
+    }]);
     setEditingSection(sections.length);
     setOpenSection(sections.length);
   };
@@ -50,10 +80,19 @@ const AddContent = ({ course, onClose }) => {
     const newSections = [...sections];
     const lastContent = newSections[sectionIndex].content[newSections[sectionIndex].content.length - 1];
     if (lastContent.title.trim() === '' || lastContent.url.trim() === '') {
-      toast.error('Please fill in all fields for the current content before adding a new one.');
+      toast.error('Please fill in all required fields for the current content before adding a new one.');
       return;
     }
-    newSections[sectionIndex].content.push({ title: '', description: '', url: '' });
+    newSections[sectionIndex].content.push({
+      title: '',
+      description: '',
+      type: 'video',
+      url: '',
+      duration: 0,
+      // fileSize: 0,
+      isOptional: false,
+      order: newSections[sectionIndex].content.length + 1
+    });
     setSections(newSections);
     setEditingContent({ section: sectionIndex, content: newSections[sectionIndex].content.length - 1 });
     setOpenSection(sectionIndex);
@@ -79,9 +118,12 @@ const AddContent = ({ course, onClose }) => {
   const handleInputChange = (sectionIndex, contentIndex, field, value) => {
     const newSections = [...sections];
     if (contentIndex === null) {
-      newSections[sectionIndex].section = value;
+      newSections[sectionIndex][field] = value;
     } else {
       newSections[sectionIndex].content[contentIndex][field] = value;
+      if (field === 'duration') {
+        newSections[sectionIndex].estimatedDuration = newSections[sectionIndex].content.reduce((total, item) => total + (item.duration || 0), 0);
+      }
     }
     setSections(newSections);
   };
@@ -100,7 +142,7 @@ const AddContent = ({ course, onClose }) => {
 
   const handleSave = () => {
     const hasEmptyFields = sections.some(section =>
-      section.section.trim() === '' ||
+      section.title.trim() === '' ||
       section.content.some(content =>
         content.title.trim() === '' ||
         content.url.trim() === ''
@@ -108,16 +150,22 @@ const AddContent = ({ course, onClose }) => {
     );
 
     if (hasEmptyFields) {
-      toast.error('Please fill in all fields before saving.');
+      toast.error('Please fill in all required fields before saving.');
       return;
     }
 
-    mutation.mutate({ content: sections })
+    // const totalVideoDuration = sections.reduce((total, section) =>
+    //   total + section.content.reduce((sectionTotal, content) =>
+    //     sectionTotal + (content.type === 'video' ? content.duration : 0), 0), 0);
+
+    mutation.mutate({
+      sections: sections,
+      status: 'pending'
+    });
   };
 
   return (
     <Box maxWidth='md'>
-      <Typography variant='h6'>Course Content</Typography>
       <Stack direction='row' justifyContent='space-between' mt={1} mb={3}>
         <Box />
         <CButton loading={mutation.isPending} contained onClick={handleSave}>Save Course Content</CButton>
@@ -126,27 +174,47 @@ const AddContent = ({ course, onClose }) => {
         <Paper key={sectionIndex} elevation={3} sx={{ mb: 2, p: 2 }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Typography variant="h6" onClick={() => toggleSection(sectionIndex)} sx={{ cursor: 'pointer', flexGrow: 1 }}>
-              {section.section || 'Untitled Section'}
+              <b>{section.order}. </b> {section.title || 'Untitled Section'}
               {openSection === sectionIndex ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </Typography>
             <IconButton disabled={sections.length === 1} color="error" onClick={() => removeSection(sectionIndex)}><DeleteIcon /></IconButton>
           </Box>
           <Collapse in={openSection === sectionIndex}>
             {editingSection === sectionIndex ? (
-              <Box display='flex' alignItems='center' mt={2}>
+              <Box display='flex' flexDirection='column' mt={2}>
                 <TextField
-                  label="Section"
-                  value={section.section}
-                  onChange={(e) => handleInputChange(sectionIndex, null, 'section', e.target.value)}
+                  label="Section Title"
+                  value={section.title}
+                  onChange={(e) => handleInputChange(sectionIndex, null, 'title', e.target.value)}
                   variant="outlined"
                   fullWidth
                   sx={{ mb: 2 }}
                 />
-                <IconButton color="primary" onClick={() => toggleEdit(sectionIndex, null)}><SaveIcon /></IconButton>
+                <TextField
+                  label="Section Description"
+                  value={section.description}
+                  onChange={(e) => handleInputChange(sectionIndex, null, 'description', e.target.value)}
+                  variant="outlined"
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <TextField
+                  label="Order"
+                  type="number"
+                  value={section.order}
+                  onChange={(e) => handleInputChange(sectionIndex, null, 'order', parseInt(e.target.value))}
+                  variant="outlined"
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <Button color="primary" onClick={() => toggleEdit(sectionIndex, null)}>Save</Button>
               </Box>
             ) : (
-              <Box display='flex' alignItems='center' mt={2}>
-                <Typography variant="body1"><strong>Section:</strong> {section.section || 'No Section'}</Typography>
+              <Box mt={2}>
+                <Typography variant="body1"><strong>Title:</strong> {section.title || 'No Title'}</Typography>
+                <Typography variant="body1"><strong>Description:</strong> {section.description || 'No Description'}</Typography>
+                <Typography variant="body1"><strong>Order:</strong> {section.order}</Typography>
+                <Typography variant="body1"><strong>Estimated Duration:</strong> {section.estimatedDuration} minutes</Typography>
                 <IconButton color="primary" onClick={() => toggleEdit(sectionIndex, null)}><EditIcon fontSize='small' /></IconButton>
               </Box>
             )}
@@ -179,21 +247,72 @@ const AddContent = ({ course, onClose }) => {
                         fullWidth
                         sx={{ mb: 2 }}
                       />
+                      <Select
+                        value={content.type}
+                        onChange={(e) => handleInputChange(sectionIndex, contentIndex, 'type', e.target.value)}
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      >
+                        <MenuItem value="video">Video</MenuItem>
+                        <MenuItem value="document">Document</MenuItem>
+                      </Select>
                       <TextField
-                        label="Video URL"
+                        label="URL"
                         value={content.url}
                         onChange={(e) => handleInputChange(sectionIndex, contentIndex, 'url', e.target.value)}
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
                       />
-                      <IconButton color="primary" onClick={() => toggleEdit(sectionIndex, contentIndex)}><SaveIcon /></IconButton>
+                      <TextField
+                        label="Duration (minutes)"
+                        type="number"
+                        value={content.duration}
+                        onChange={(e) => handleInputChange(sectionIndex, contentIndex, 'duration', parseInt(e.target.value))}
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      />
+                      {/* <TextField
+                        label="File Size (KB)"
+                        type="number"
+                        value={content.fileSize}
+                        onChange={(e) => handleInputChange(sectionIndex, contentIndex, 'fileSize', parseInt(e.target.value))}
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                      /> */}
+                      <Stack direction='row' gap={2} justifyContent='space-between'>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={content.isOptional}
+                              onChange={(e) => handleInputChange(sectionIndex, contentIndex, 'isOptional', e.target.checked)}
+                            />
+                          }
+                          label="Optional"
+                        />
+                        <TextField
+                          size='small'
+                          label="Order"
+                          type="number"
+                          value={content.order}
+                          onChange={(e) => handleInputChange(sectionIndex, contentIndex, 'order', parseInt(e.target.value))}
+                          variant="outlined"
+                        />
+                      </Stack>
+                      <Button color="primary" onClick={() => toggleEdit(sectionIndex, contentIndex)}>Save</Button>
                     </Box>
                   ) : (
                     <Box mt={2}>
                       <Typography variant="body1"><strong>Title:</strong> {content.title || 'No Title'}</Typography>
                       <Typography variant="body1"><strong>Description:</strong> {content.description || 'No Description'}</Typography>
-                      <Typography variant="body1"><strong>Video URL:</strong> {content.url || 'No Video URL'}</Typography>
+                      <Typography variant="body1"><strong>Type:</strong> {content.type}</Typography>
+                      <Typography variant="body1"><strong>URL:</strong> {content.url || 'No URL'}</Typography>
+                      <Typography variant="body1"><strong>Duration:</strong> {content.duration} minutes</Typography>
+                      {/* <Typography variant="body1"><strong>File Size:</strong> {content.fileSize} KB</Typography> */}
+                      <Typography variant="body1"><strong>Optional:</strong> {content.isOptional ? 'Yes' : 'No'}</Typography>
+                      <Typography variant="body1"><strong>Order:</strong> {content.order}</Typography>
                       <IconButton color="primary" onClick={() => toggleEdit(sectionIndex, contentIndex)}><EditIcon /></IconButton>
                     </Box>
                   )}

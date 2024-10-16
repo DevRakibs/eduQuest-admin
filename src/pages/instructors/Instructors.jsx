@@ -16,10 +16,11 @@ const Instructors = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [instructor, setInstructor] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [search, setSearch] = useState('');
 
   const { data: instructors, isLoading } = useQuery({
-    queryKey: ['instructor'],
-    queryFn: () => axiosReq.get('/instructor/all')
+    queryKey: ['instructor', search],
+    queryFn: () => axiosReq.get('/instructor/all', { params: { search } })
   })
 
   const handleDialog = () => setEditDialogOpen(false)
@@ -81,14 +82,6 @@ const Instructors = () => {
         <Chip label={params.row.isVerified ? 'Verified' : 'Unverified'} color={params.row.isVerified ? 'success' : 'warning'} />
       ),
     },
-    // {
-    //   field: 'status',
-    //   headerName: 'Status',
-    //   width: 150,
-    //   renderCell: (params) => (
-    //     <Chip label={params.value} color={params.value === 'Active' ? 'success' : 'warning'} />
-    //   ),
-    // },
     {
       field: 'options',
       headerName: '',
@@ -145,6 +138,7 @@ const Instructors = () => {
       <Box mt={3} mb={2}>
         <TextField
           size="small"
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search Instructor..."
           InputProps={{
             startAdornment: (

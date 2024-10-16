@@ -14,8 +14,6 @@ import useAuth from '../../../hook/useAuth';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../utils/upload';
 
-Quill.register('modules/imageUploader', ImageUploader);
-
 const quillModules = {
   toolbar: [
     [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
@@ -25,21 +23,6 @@ const quillModules = {
     ['link', 'image', 'video'],
     ['clean']
   ],
-  imageUploader: {
-    upload: file => {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append('image', file);
-        fetch('https://api.yoursite.com/upload', {
-          method: 'POST',
-          body: formData,
-        })
-          .then(response => response.json())
-          .then(result => resolve(result.url))
-          .catch(() => reject('Upload failed'));
-      });
-    }
-  }
 };
 
 const AddInfo = ({ onClose }) => {

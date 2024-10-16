@@ -150,8 +150,8 @@ const EnrollStudent = ({ onClose, course }) => {
                 setErrors(prev => ({ ...prev, paymentStatus: '' }))
               }}
             >
-              <MenuItem value={'pending'}>Pending</MenuItem>
-              <MenuItem value={'confirmed'}>Confirmed</MenuItem>
+              <MenuItem value={'unpaid'}>Unpaid</MenuItem>
+              <MenuItem value={'paid'}>Paid</MenuItem>
             </Select>
             {errors.paymentStatus && <Typography color="error" variant="caption">{errors.paymentStatus}</Typography>}
           </FormControl>

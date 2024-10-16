@@ -1,33 +1,41 @@
-import { Box, Button, Container, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material'
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
-import { Add, ContentCopyOutlined, DeleteOutline, DownloadOutlined, EditOutlined, GetAppOutlined, InsertDriveFileOutlined, Person2Outlined } from '@mui/icons-material'
+import { Add, ContentCopyOutlined, DeleteOutline, DownloadOutlined, EditOutlined, GetAppOutlined, InsertDriveFileOutlined, Person2Outlined, Search } from '@mui/icons-material'
 import useIsMobile from '../../hook/useIsMobile'
 import DataTable from '../../common/DataTable'
 import CButton from '../../common/CButton'
 import CDialog from '../../common/CDialog'
 import AddResourse from './AddResourse'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { axiosReq } from '../../../utils/axiosReq'
+import EditResourse from './EditResourse'
+import useAuth from '../../hook/useAuth'
+import toast from 'react-hot-toast'
 
-const data = [
+const resourses = [
   {
     id: 1,
     title: '907 – Responsive Multi-Purpose WordPress Theme',
     category: 'Theme',
     updateOn: 'January 20, 2022',
-    version: '5.1.5'
+    version: '5.1.5',
+    files: 2,
   },
   {
     id: 2,
     title: 'Add To Cart Redirect for WooCommerce',
     category: 'Plugins',
     updateOn: 'January 20, 2022',
-    version: '3.4.0'
+    version: '3.4.0',
+    files: 1,
   },
   {
     id: 3,
     title: 'AdForest – Classified Ads WordPress Theme',
     category: 'Themes',
     updateOn: 'January 20, 2022',
-    version: '2.0.2'
+    version: '2.0.2',
+    files: 1,
   },
   {
     id: 4,
@@ -53,8 +61,57 @@ const data = [
 ]
 
 const Resourse = () => {
-  const [category, setCategory] = useState('')
+  const [search, setSearch] = useState('');
   const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editResourse, setEditResourse] = useState(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deleteResourseId, setDeleteResourseId] = useState(null)
+
+  const { token } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { data: resourses, isLoading } = useQuery({
+    queryKey: ['resourse', search],
+    queryFn: async () => {
+      const res = await axiosReq.get('/resourse/all', {
+        params: {
+          search: search
+        }
+      })
+      return res.data
+    }
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => axiosReq.delete(`/resourse/delete/${deleteResourseId}`, { headers: { Authorization: token } }),
+    onSuccess: (res) => {
+      toast.success(res.data);
+      queryClient.invalidateQueries(['resourse']);
+      setDeleteDialogOpen(false)
+      setDeleteResourseId(null)
+    },
+    onError: (error) => {
+      toast.error(error.response.data);
+    }
+  });
+
+
+
+  const handleEdit = (resourse) => {
+    setEditDialogOpen(true)
+    setEditResourse(resourse)
+  }
+
+  const handleDeleteDialog = (id) => {
+    setDeleteDialogOpen(true)
+    setDeleteResourseId(id)
+  }
+
+  const handleDelete = () => {
+    deleteMutation.mutate()
+  }
 
 
   const columns = [
@@ -64,41 +121,34 @@ const Resourse = () => {
         <Stack sx={{ height: '100%' }} direction='row' gap={1.5} alignItems='center'>
           <img style={{ width: '30px' }} src="/file2.svg" alt="" />
           <Stack >
-            <Typography sx={{ fontSize: '14px' }}>{params.row.title}</Typography>
-            <Stack direction='row' gap={2} alignItems='center'>
-              <Stack direction='row' gap={2}>
-                <Typography sx={{ fontSize: '12px', display: 'inline-flex', gap: .5, alignItems: 'center' }}>
-                  <ContentCopyOutlined sx={{ fontSize: '12px' }} /> 1 files(s)
-                </Typography>
-              </Stack>
-              <Stack direction='row' gap={2}>
-                <Typography sx={{ fontSize: '12px', display: 'inline-flex', gap: .5, alignItems: 'center' }}>
-                  <GetAppOutlined sx={{ fontSize: '12px' }} /> 292 downloads
-                </Typography>
-              </Stack>
-            </Stack>
+            <Typography >{params.row.name}</Typography>
+            {params.row.files && (
+              <Typography sx={{ fontSize: '12px', display: 'inline-flex', gap: .5, alignItems: 'center' }}>
+                <ContentCopyOutlined sx={{ fontSize: '12px' }} /> {params.row.files} files(s)
+              </Typography>
+            )}
           </Stack>
         </Stack>
       )
     },
     {
-      field: 'Categories', headerName: 'Categories', width: 200,
+      field: 'Categories', headerName: 'Categories', width: 250,
       renderCell: (params) => (
         <Stack sx={{ height: '100%' }} direction='row' gap={1} alignItems='center'>
           <Typography>{params.row.category}</Typography>
         </Stack>
       )
     },
+    // {
+    //   field: 'updateOn', headerName: 'Update On', width: 200,
+    //   renderCell: (params) => (
+    //     <Stack sx={{ height: '100%' }} direction='row' gap={1} alignItems='center'>
+    //       <Typography>{params.row.updateOn}</Typography>
+    //     </Stack>
+    //   )
+    // },
     {
-      field: 'updateOn', headerName: 'Update On', width: 200,
-      renderCell: (params) => (
-        <Stack sx={{ height: '100%' }} direction='row' gap={1} alignItems='center'>
-          <Typography>{params.row.updateOn}</Typography>
-        </Stack>
-      )
-    },
-    {
-      field: 'version', headerName: 'Version', width: 150,
+      field: 'version', headerName: 'Version', width: 200,
       renderCell: (params) => (
         <Stack sx={{ height: '100%' }} justifyContent='center'>
           <Typography>{params.row.version}</Typography>
@@ -111,10 +161,10 @@ const Resourse = () => {
       width: 100,
       renderCell: (params) => (
         <Stack direction='row' alignItems='center' height='100%'>
-          <IconButton>
+          <IconButton onClick={() => handleEdit(params.row)}>
             <EditOutlined fontSize='small' />
           </IconButton>
-          <IconButton>
+          <IconButton onClick={() => handleDeleteDialog(params.row._id)}>
             <DeleteOutline fontSize='small' />
           </IconButton>
         </Stack>
@@ -122,43 +172,62 @@ const Resourse = () => {
     },
     {
       field: 'Download', headerName: '', width: 150,
-      renderCell: (params) => <IconButton><DownloadOutlined fontSize='small' /></IconButton>
+      renderCell: (params) => <IconButton onClick={() => window.open(params.row.url, '_blank')} ><DownloadOutlined /></IconButton>
     },
   ];
   return (
     <Box>
-      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between'>
-        <Box>
-          <Typography variant='h5'>Resourses</Typography>
-          <Typography variant='body2'>Total Resourses (10)</Typography>
-        </Box>
+      <Box>
+        <Typography variant='h5'>Resourses</Typography>
+        <Typography variant='body2'>Total Resourses (10)</Typography>
+      </Box>
 
-        <Stack direction='row' gap={2} alignItems='center' justifyContent='space-between'>
-          <Box sx={{ minWidth: 120 }} >
-            <FormControl fullWidth size='small'>
-              <InputLabel>Category</InputLabel>
-              <Select
-                value={category}
-                label="Category"
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <MenuItem value={10}>All</MenuItem>
-                <MenuItem value={20}>Wordpress theme</MenuItem>
-                <MenuItem value={30}>Plugins</MenuItem>
-                <MenuItem value={40}>Premuim theme</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add</CButton>
-        </Stack>
+      <Stack direction={{ xs: 'column-reverse', md: 'row' }} gap={2} mt={3} justifyContent='space-between'>
+        <Box>
+          <TextField
+            onChange={(e) => setSearch(e.target.value)}
+            size="small"
+            placeholder="Search..."
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+        <CButton style={{ width: '100px' }} onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add</CButton>
       </Stack>
 
-      <CDialog open={addDialogOpen}>
+      <CDialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)} title='Add Resourse'>
         <AddResourse onClose={() => setAddDialogOpen(false)} />
       </CDialog>
 
+      <CDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} title='Edit Resourse'>
+        <EditResourse onClose={() => setEditDialogOpen(false)} resourse={editResourse} />
+      </CDialog>
+
+      {/* delete dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Delete resourse</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Are you sure you want to delete this resourse?</DialogContentText>
+          <DialogContentText color='error'>This action cannot be undone.</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <CButton onClick={() => setDeleteDialogOpen(false)}>Cancel</CButton>
+          <CButton loading={deleteMutation.isPending} onClick={handleDelete} color="error">Delete</CButton>
+        </DialogActions>
+      </Dialog>
+
       <Box mt={4}>
-        <DataTable columns={columns} rows={data} />
+        <DataTable
+          columns={columns}
+          rows={resourses}
+          getRowId={(row) => row._id}
+          loading={isLoading}
+        />
       </Box>
     </Box>
   )

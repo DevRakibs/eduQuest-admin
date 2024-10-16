@@ -36,7 +36,7 @@ const Enrolment = () => {
     queryKey: ['enrollment'],
     queryFn: () => axiosReq.get('course/enrolled/all', { headers: { Authorization: token } })
   })
-  console.log(enrollments?.data)
+
   const columns = [
     {
       field: 'Students',
@@ -105,7 +105,7 @@ const Enrolment = () => {
 
   return (
     <Box maxWidth='xl'>
-      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between'>
+      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} alignItems='center' justifyContent='space-between'>
         <Box>
           <Typography variant='h5'>Enrollment List</Typography>
           <Typography variant='body2'>Total Enrollments (10)</Typography>
@@ -125,7 +125,7 @@ const Enrolment = () => {
           loading={isLoading}
           getRowId={(row) => row.student._id}
           rowHeight={70}
-          noRowsLabel='No Course Available'
+          noRowsLabel='No Enrollment Found'
         />
       </Box>
 
