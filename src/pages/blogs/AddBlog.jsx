@@ -18,12 +18,15 @@ import { uploadImage } from '../../../utils/upload';
 
 const modules = {
   toolbar: [
-    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-    [{ size: [] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    ['bold', 'italic', 'underline', 'strike'],
+    ['blockquote'],
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ indent: '-1' }, { indent: '+1' }], // Indentation options
+    [{ align: [] }],
+    [{ color: [] }, { background: [] }],
     ['link', 'image', 'video'],
-    ['clean']
+    ['clean'], // Remove formatting option
   ],
   // imageUploader: {
   //   upload: (file) => {
@@ -139,7 +142,6 @@ const AddBlog = ({ onClose }) => {
             value={content}
             onChange={e => setContent(e)}
             modules={modules}
-            formats={['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'link', 'image', 'video']}
             placeholder="Write your blog content here..."
           />
         </Stack>

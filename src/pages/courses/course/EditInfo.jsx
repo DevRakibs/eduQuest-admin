@@ -1,12 +1,10 @@
 /* eslint-disable react/prop-types */
-import { Autocomplete, Avatar, Box, Button, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Collapse, FormControl, IconButton, MenuItem, Paper, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import Quill from 'quill';
-import ImageUploader from 'quill-image-uploader';
 import 'quill-image-uploader/dist/quill.imageUploader.min.css';
-import { Add, Close, Delete, KeyboardArrowDownOutlined, Upload } from '@mui/icons-material';
+import { Add, Delete, KeyboardArrowDownOutlined, Upload } from '@mui/icons-material';
 import CButton from '../../../common/CButton';
 import CTextField from '../../../common/CTextField';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -14,35 +12,22 @@ import { axiosReq } from '../../../../utils/axiosReq';
 import useAuth from '../../../hook/useAuth';
 import toast from 'react-hot-toast';
 import { deleteImage, uploadImage } from '../../../../utils/upload';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 
-Quill.register('modules/imageUploader', ImageUploader);
 
 const quillModules = {
   toolbar: [
-    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-    [{ size: [] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    ['bold', 'italic', 'underline', 'strike'],
+    ['blockquote'],
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ indent: '-1' }, { indent: '+1' }], // Indentation options
+    [{ align: [] }],
+    [{ color: [] }, { background: [] }],
     ['link', 'image', 'video'],
-    ['clean']
+    ['clean'], // Remove formatting option
   ],
-  imageUploader: {
-    upload: file => {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append('image', file);
-        fetch('https://api.yoursite.com/upload', {
-          method: 'POST',
-          body: formData,
-        })
-          .then(response => response.json())
-          .then(result => resolve(result.url))
-          .catch(() => reject('Upload failed'));
-      });
-    }
-  }
 };
 
 const EditInfo = ({ course, onClose }) => {
@@ -317,7 +302,6 @@ const EditInfo = ({ course, onClose }) => {
           value={description}
           onChange={(e) => setDescription(e)}
           modules={quillModules}
-          formats={['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'link', 'image', 'video']}
           placeholder="Write Description here..."
         />
         {errors.description && <Typography color="error" variant="caption">{errors.description}</Typography>}

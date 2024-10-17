@@ -37,7 +37,7 @@ const Blogs = () => {
     setEditDialogOpen(true)
     setEditBlogData(data)
   }
-  console.log(blogs)
+
   const columns = [
     {
       field: 'Title',
@@ -46,7 +46,9 @@ const Blogs = () => {
       renderCell: (params) => (
         <Stack gap={1} direction='row' alignItems='center' height='100%'>
           <img style={{ width: 80, height: 50, objectFit: 'cover', borderRadius: 5 }} src={params.row.image} alt="" />
-          <Typography sx={{ fontWeight: 600, color: 'text.main' }}>{params.row.title}</Typography>
+          <Link to={`/dashboard/blog/${params.row._id}`}>
+            <Typography sx={{ fontWeight: 600, color: 'text.main' }}>{params.row.title}</Typography>
+          </Link>
         </Stack>
       ),
     },

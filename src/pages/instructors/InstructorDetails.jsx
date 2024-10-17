@@ -26,7 +26,7 @@ const InstructorDetails = () => {
       bgcolor: '#fff',
       borderRadius: '8px',
       p: 3,
-      minHeight: '70vh'
+      minHeight: '100vh'
     }} maxWidth='xl'>
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>

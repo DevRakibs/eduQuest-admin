@@ -16,12 +16,15 @@ import { uploadImage } from '../../../../utils/upload';
 
 const quillModules = {
   toolbar: [
-    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-    [{ size: [] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    ['bold', 'italic', 'underline', 'strike'],
+    ['blockquote'],
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ indent: '-1' }, { indent: '+1' }], // Indentation options
+    [{ align: [] }],
+    [{ color: [] }, { background: [] }],
     ['link', 'image', 'video'],
-    ['clean']
+    ['clean'], // Remove formatting option
   ],
 };
 
@@ -301,7 +304,6 @@ const AddInfo = ({ onClose }) => {
           value={payload.description}
           onChange={(e) => setPayload({ ...payload, description: e })}
           modules={quillModules}
-          formats={['header', 'font', 'size', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'link', 'image', 'video']}
           placeholder="Write Description here..."
         />
         {errors.description && <Typography color="error" variant="caption">{errors.description}</Typography>}

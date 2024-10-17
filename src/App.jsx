@@ -21,6 +21,7 @@ import ForgotePass from './pages/forgotePass/ForgotePass'
 import PasswordReset from './pages/password-reset/PasswordReset'
 import CourseDetails from './pages/courses/course/CourseDetails'
 import StudentDetails from './pages/students/StudentDetails'
+import BlogDetails from './pages/blogs/BlogDetails'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -58,6 +59,7 @@ function App() {
           <Route path='enrolment' element={<Enrolment />} />
           <Route path='resourse' element={<Resourse />} />
           <Route path='blog' element={<Blogs />} />
+          <Route path='blog/:id' element={<BlogDetails />} />
           <Route path='faq' element={<Faq />} />
           <Route path='setting' element={<Setting />} />
           <Route path='*' element={<NotFound />} />
