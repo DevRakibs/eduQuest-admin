@@ -84,6 +84,7 @@ const Profile = () => {
         <Stack>
           <Typography variant='h6'>Profile image <span style={{ fontSize: '12px', fontWeight: 400 }}>( jpg / png ) (Max 500KB)</span> </Typography>
           <input
+            disabled={!editOn}
             onChange={(e) => setFile(e.target.files[0])}
             accept="image/*"
             style={{ display: 'none' }}

@@ -1,10 +1,11 @@
-import { Box, Grid, Avatar, Typography, Card, CardContent, Divider, Chip } from '@mui/material'
+import { Box, Grid, Avatar, Typography, Card, CardContent, Divider, Chip, IconButton } from '@mui/material'
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { axiosReq } from '../../../utils/axiosReq';
 import Loader from '../../common/Loader';
 import { format } from 'date-fns';
+import { ArrowBack } from '@mui/icons-material';
 
 const InstructorDetails = () => {
   const { id } = useParams()
@@ -16,7 +17,7 @@ const InstructorDetails = () => {
       return res.data
     }
   })
-
+  const navigate = useNavigate()
   if (isLoading) {
     return <Loader />
   }
@@ -28,6 +29,9 @@ const InstructorDetails = () => {
       p: 3,
       minHeight: '100vh'
     }} maxWidth='xl'>
+      <IconButton onClick={() => navigate(-1)}>
+        <ArrowBack />
+      </IconButton>
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

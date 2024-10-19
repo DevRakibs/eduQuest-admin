@@ -18,17 +18,26 @@ const Blogs = () => {
   const [search, setSearch] = useState('')
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editBlogData, setEditBlogData] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [category, setCategory] = useState([])
 
-
-  const { data: blogs, isLoading } = useQuery({
-    queryKey: ['blog', search],
+  const { data: blogs, isLoading, isError } = useQuery({
+    queryKey: ['blog', search, selectedCategory],
     queryFn: async () => {
       const res = await axiosReq.get('/blog/all', {
         params: {
-          search: search
+          search: search,
+          category: selectedCategory === 'All' ? '' : selectedCategory
         }
       })
       return res.data
+    }
+  })
+  useQuery({
+    queryKey: ['blog/category'],
+    queryFn: async () => {
+      const res = await axiosReq.get('/blog/all')
+      setCategory(res.data.map(item => item.category))
     }
   })
 
@@ -45,7 +54,7 @@ const Blogs = () => {
       width: 300,
       renderCell: (params) => (
         <Stack gap={1} direction='row' alignItems='center' height='100%'>
-          <img style={{ width: 80, height: 50, objectFit: 'cover', borderRadius: 5 }} src={params.row.image} alt="" />
+          <img style={{ width: '60px', height: 50, objectFit: 'cover' }} src={params.row.image} alt="" />
           <Link to={`/dashboard/blog/${params.row._id}`}>
             <Typography sx={{ fontWeight: 600, color: 'text.main' }}>{params.row.title}</Typography>
           </Link>
@@ -55,7 +64,7 @@ const Blogs = () => {
     {
       field: 'Author',
       headerName: 'Author',
-      width: 300,
+      width: 220,
       renderCell: (params) => (
         <Stack gap={1} direction='row' alignItems='center' height='100%'>
           <Avatar src={params.row.author.img} />
@@ -63,7 +72,7 @@ const Blogs = () => {
             {/* <Link to={`/dashboard/instructor/${params.row.author._id}`}> */}
             <Typography>@{params.row.author.username}</Typography>
             {/* </Link> */}
-            <Typography>{params.row.author.email}</Typography>
+            {/* <Typography>{params.row.author.email}</Typography> */}
           </Box>
         </Stack>
       ),
@@ -108,25 +117,38 @@ const Blogs = () => {
         <Typography variant='h5'>Blogs</Typography>
         <Typography variant='body2'>Total Blogs (10)</Typography>
       </Box>
-      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} alignItems='center' justifyContent='space-between'>
-
-        <Box mt={3} mb={2}>
-          <TextField
-            onChange={(e) => setSearch(e.target.value)}
-            size="small"
-            placeholder="Search..."
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-
+      <Stack direction='row' justifyContent='space-between'>
+        <Box />
         <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Create</CButton>
       </Stack>
+
+      <Box display='flex' alignItems='center' gap={2} my={2}>
+        <TextField
+          onChange={(e) => setSearch(e.target.value)}
+          size="small"
+          placeholder="Search..."
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <FormControl sx={{ width: 150 }} size='small' >
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={selectedCategory}
+            label="Category"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <MenuItem value='All'>All</MenuItem>
+            {category?.map((item, index) => (
+              <MenuItem key={index} value={item}>{item}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
 
       {/* add  */}
       <CDialog disableOutsideClick={true} maxWidth='md' title='Add Blog' open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
@@ -148,7 +170,7 @@ const Blogs = () => {
           noRowsLabel='No Blog Available'
         />
       </Box>
-    </Box>
+    </Box >
   )
 }
 

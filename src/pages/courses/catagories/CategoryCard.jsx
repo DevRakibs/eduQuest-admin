@@ -10,7 +10,7 @@ const CategoryCard = ({ data }) => {
 
   const handleDialog = () => setEditDialogOpen(p => !p)
   return (
-    <Card sx={{ maxWidth: 345, width: '100%', borderRadius: 2, p: 1 }}>
+    <Card sx={{ width: { xs: '100%', sm: 345 }, borderRadius: 2, p: 1 }}>
       <CardContent>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Avatar sx={{ bgcolor: '#8e6ac8', width: 40, height: 40, mr: 2 }} src={data.img || '/no-image.png'} />

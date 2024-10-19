@@ -22,11 +22,12 @@ const Categories = () => {
 
   return (
     <Box>
-      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} alignItems='center' justifyContent='space-between'>
-        <Box>
-          <Typography variant='h5'>Course Categories</Typography>
-          <Typography variant='body2'>Total Catagories ({categories?.data.length})</Typography>
-        </Box>
+      <Box>
+        <Typography variant='h5'>Course Categories</Typography>
+        <Typography variant='body2'>Total Catagories ({categories?.data.length})</Typography>
+      </Box>
+      <Stack mt={2} direction='row' justifyContent='space-between'>
+        <Box />
         <CButton onClick={handleDialog} contained startIcon={<Add />} >Add Catagories</CButton>
       </Stack>
       {/* add categroy */}

@@ -67,20 +67,29 @@ const Resourse = () => {
   const [editResourse, setEditResourse] = useState(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deleteResourseId, setDeleteResourseId] = useState(null)
-
+  const [selectedCategory, setSelectedCategory] = useState('All')
   const { token } = useAuth()
 
   const queryClient = useQueryClient()
 
   const { data: resourses, isLoading } = useQuery({
-    queryKey: ['resourse', search],
+    queryKey: ['resourse', search, selectedCategory],
     queryFn: async () => {
       const res = await axiosReq.get('/resourse/all', {
         params: {
-          search: search
+          search: search,
+          category: selectedCategory === 'All' ? '' : selectedCategory
         }
       })
       return res.data
+    }
+  })
+
+  const { data: category, } = useQuery({
+    queryKey: ['resourse/category'],
+    queryFn: async () => {
+      const res = await axiosReq.get('/resourse/all')
+      return res.data.map(item => item.category)
     }
   })
 
@@ -182,23 +191,38 @@ const Resourse = () => {
         <Typography variant='body2'>Total Resourses (10)</Typography>
       </Box>
 
-      <Stack direction={{ xs: 'column-reverse', md: 'row' }} gap={2} mt={3} justifyContent='space-between'>
-        <Box>
-          <TextField
-            onChange={(e) => setSearch(e.target.value)}
-            size="small"
-            placeholder="Search..."
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
+      <Stack direction='row' mt={2} justifyContent='space-between'>
+        <Box />
         <CButton style={{ width: '100px' }} onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add</CButton>
       </Stack>
+
+      <Box display='flex' alignItems='center' gap={2} my={2}>
+        <TextField
+          onChange={(e) => setSearch(e.target.value)}
+          size="small"
+          placeholder="Search..."
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <FormControl sx={{ width: 150 }} size='small' >
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={selectedCategory}
+            label="Category"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <MenuItem value='All' onClick={() => setSelectedCategory('All')}>All</MenuItem>
+            {category?.map((item, index) => (
+              <MenuItem key={index} value={item}>{item}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
 
       <CDialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)} title='Add Resourse'>
         <AddResourse onClose={() => setAddDialogOpen(false)} />

@@ -97,15 +97,15 @@ function Layout() {
                 boxShadow: 2
               }}>
                 <Stack gap={2} p={2}>
-                  <Link to='/dashboard/setting/profile' className='link'>
+                  {/* <Link to='/dashboard/setting/profile' className='link'>
                     <ListItem disablePadding>
                       <ListItemIcon sx={{ minWidth: '30px' }}>
                         <PersonOutline fontSize='small' />
                       </ListItemIcon>
                       <Typography sx={{ fontSize: '14px' }}>View Profile</Typography>
                     </ListItem>
-                  </Link>
-                  <Link to='/dashboard/settings/account' className='link'>
+                  </Link> */}
+                  <Link to='/dashboard/setting' className='link'>
                     <ListItem disablePadding>
                       <ListItemIcon sx={{ minWidth: '30px' }}>
                         <SettingsOutlined fontSize='small' />

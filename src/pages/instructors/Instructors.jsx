@@ -99,31 +99,10 @@ const Instructors = () => {
 
   return (
     <Box maxWidth='xl'>
-      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between'>
-        <Box>
-          <Typography variant='h5'>Instructors</Typography>
-          <Typography variant='body2'>Total Instructors (10)</Typography>
-        </Box>
-
-        <Stack direction='row' gap={2} alignItems='center' justifyContent='space-between'>
-          <Box sx={{ minWidth: 150 }} >
-            {/* <FormControl fullWidth size='small'>
-              <InputLabel>Filter</InputLabel>
-              <Select
-                value={filter}
-                label="Filter"
-                onChange={(e) => setFilters(e.target.value)}
-              >
-                <MenuItem value={10}>None</MenuItem>
-                <MenuItem value={10}>Active</MenuItem>
-                <MenuItem value={20}>Inactive</MenuItem>
-                <MenuItem value={20}>Blocked</MenuItem>
-              </Select>
-            </FormControl> */}
-          </Box>
-          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add a Instructor</CButton>
-        </Stack>
-      </Stack>
+      <Box>
+        <Typography variant='h5'>Instructors</Typography>
+        <Typography variant='body2'>Total Instructors (10)</Typography>
+      </Box>
 
       {/* add instructor  */}
       <CDialog open={addDialogOpen} title='Add Instructor' onClose={() => setAddDialogOpen(false)}>
@@ -135,20 +114,24 @@ const Instructors = () => {
         <EditInstructor data={instructor} onClose={handleDialog} />
       </CDialog>
 
-      <Box mt={3} mb={2}>
-        <TextField
-          size="small"
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search Instructor..."
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Box>
+      <Stack direction='row' mt={2} gap={2} justifyContent='space-between'>
+        <Box sx={{ width: 200 }}>
+          <TextField
+            fullWidth
+            size="small"
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search..."
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+        <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add a Instructor</CButton>
+      </Stack>
 
       <Box mt={4}>
         <DataTable

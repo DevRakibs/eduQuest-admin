@@ -105,11 +105,12 @@ const Enrolment = () => {
 
   return (
     <Box maxWidth='xl'>
-      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} alignItems='center' justifyContent='space-between'>
-        <Box>
-          <Typography variant='h5'>Enrollment List</Typography>
-          <Typography variant='body2'>Total Enrollments (10)</Typography>
-        </Box>
+      <Box>
+        <Typography variant='h5'>Enrollment List</Typography>
+        <Typography variant='body2'>Total Enrollments (10)</Typography>
+      </Box>
+      <Stack direction='row' mt={2} justifyContent='space-between'>
+        <Box />
         <CButton onClick={handleDialog} contained startIcon={<Add />} >Enroll a Student</CButton>
       </Stack>
 

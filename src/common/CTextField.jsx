@@ -12,6 +12,9 @@ const CTextField = ({
   fullWidth = true,
   error = false,
   helperText = '',
+  multiline = false,
+  row = 1,
+  disabled = false,
   ...props
 }) => {
   return (
@@ -22,15 +25,23 @@ const CTextField = ({
         </Typography>
       )}
       <TextField
+        sx={{
+          '& .MuiInputBase-root': {
+            opacity: disabled ? 0.5 : 1
+          }
+        }}
         label={label}
         value={value}
         onChange={onChange}
         name={name}
+        multiline={multiline}
+        rows={row}
         variant={variant}
         fullWidth={fullWidth}
         error={error}
         helperText={helperText}
         {...props}
+        disabled={disabled}
       />
     </Stack>
   );

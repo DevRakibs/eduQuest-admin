@@ -1,8 +1,9 @@
-import { Box, Typography, Avatar, Grid, Card, CardContent, Divider } from '@mui/material'
+import { Box, Typography, Avatar, Grid, Card, CardContent, Divider, IconButton } from '@mui/material'
 import React from 'react'
 import { axiosReq } from '../../../utils/axiosReq'
 import { useQuery } from '@tanstack/react-query'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { ArrowBack } from '@mui/icons-material'
 
 const StudentDetails = () => {
   const { id } = useParams()
@@ -14,7 +15,7 @@ const StudentDetails = () => {
       return res.data
     }
   })
-  console.log(student)
+  const navigate = useNavigate()
   if (isLoading) {
     return <Typography>Loading...</Typography>
   }
@@ -25,6 +26,9 @@ const StudentDetails = () => {
       p: 4,
       minHeight: '100vh'
     }}>
+      <IconButton onClick={() => navigate(-1)}>
+        <ArrowBack />
+      </IconButton>
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

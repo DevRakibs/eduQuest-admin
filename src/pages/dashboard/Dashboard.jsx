@@ -1,7 +1,43 @@
 import { Box, Grid, Paper, Typography } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import React from 'react'
+import { axiosReq } from '../../../utils/axiosReq'
+import { format } from 'date-fns'
+import useAuth from '../../hook/useAuth'
 
 const Dashboard = () => {
+
+  const { token } = useAuth()
+
+  const { data: courses } = useQuery({
+    queryKey: ['course'],
+    queryFn: async () => {
+      const res = await axiosReq.get('/course/all')
+      return res?.data.filter(course => course.status === 'active')
+    }
+  })
+  const { data: students } = useQuery({
+    queryKey: ['student'],
+    queryFn: async () => {
+      const res = await axiosReq.get('/student/all')
+      return res?.data
+    },
+  })
+  const { data: instructors } = useQuery({
+    queryKey: ['instructor'],
+    queryFn: async () => {
+      const res = await axiosReq.get('/instructor/all')
+      return res?.data
+    }
+  })
+  const { data: enrollments } = useQuery({
+    queryKey: ['enrollment'],
+    queryFn: async () => {
+      const res = await axiosReq.get('course/enrolled/all', { headers: { Authorization: token } })
+      return res.data
+    }
+  })
+
   return (
     <Box
       maxWidth='xl'
@@ -17,7 +53,7 @@ const Dashboard = () => {
     >
       <Box sx={{ flex: 1 }}>
         <Typography sx={{ fontWeight: 300, opacity: 0.8 }}>
-          September 19, 2024
+          {format(new Date(), 'dd MMMM yyyy')}
         </Typography>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mt: 1 }}>
           Welcome Back, <span style={{ color: '#FFC107' }}>Rakibul Alam!</span>
@@ -27,23 +63,46 @@ const Dashboard = () => {
         </Typography>
 
         <Grid container spacing={2} sx={{ mt: 3 }}>
-          {[
-            { label: 'COURSES', value: 23, color: '#4a57e2' },
-            { label: 'CERTIFICATES', value: 9, color: '#e53935' },
-            { label: 'SCORE', value: 4.8, color: '#388e3c' },
-            { label: 'HRS LEARNED', value: 822, color: '#0288d1' },
-          ].map((stat) => (
-            <Grid item xs={6} sm={3} key={stat.label}>
-              <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: '#fff', color: '#000' }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  {stat.label}
-                </Typography>
-                <Typography variant="h5" component="p" sx={{ mt: 1, color: stat.color }}>
-                  {stat.value}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
+          <Grid item xs={6} sm={3}>
+            <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: '#fff', color: '#000' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                ENROLLED
+              </Typography>
+              <Typography variant="h5" component="p" sx={{ mt: 1 }}>
+                {enrollments?.length}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: '#fff', color: '#000' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                COURSES (A)
+              </Typography>
+              <Typography variant="h5" component="p" sx={{ mt: 1 }}>
+                {courses?.length}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: '#fff', color: '#000' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                STUDENTS
+              </Typography>
+              <Typography variant="h5" component="p" sx={{ mt: 1 }}>
+                {students?.length}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: '#fff', color: '#000' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                INSTRUCTORS
+              </Typography>
+              <Typography variant="h5" component="p" sx={{ mt: 1 }}>
+                {instructors?.length}
+              </Typography>
+            </Paper>
+          </Grid>
         </Grid>
       </Box>
 

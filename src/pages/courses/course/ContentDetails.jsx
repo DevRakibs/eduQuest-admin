@@ -115,7 +115,7 @@ const ContentDetails = ({ course }) => {
                           <iframe
                             width="100%"
                             height="412"
-                            src={`${item.url.replace('watch?v=', 'embed/')}?modestbranding=1&rel=0&controls=1&disablekb=1&`}
+                            src={`https://www.youtube.com/embed/${item.url.split('v=')[1].split('&')[0]}?modestbranding=1&rel=0&controls=1&disablekb=1`}
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen

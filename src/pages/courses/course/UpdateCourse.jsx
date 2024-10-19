@@ -119,7 +119,9 @@ const UpdateCourse = ({ course, onClose }) => {
           onChange={e => setCourseStatus(e.target.value)}
         >
           <MenuItem disabled value='pending'>Pending</MenuItem>
-          <MenuItem value='active'>Active</MenuItem>
+          <MenuItem value='upcoming'>Upcoming</MenuItem>
+          <MenuItem value='running'>Running</MenuItem>
+          <MenuItem value='completed'>Completed</MenuItem>
           <MenuItem value='inactive'>Inactive</MenuItem>
         </Select>
       </FormControl>

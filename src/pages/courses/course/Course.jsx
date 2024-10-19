@@ -110,9 +110,30 @@ const Course = () => {
     {
       field: 'status',
       headerName: 'Status',
-      width: 150,
+      width: 200,
       renderCell: (params) => (
-        <Chip label={params.row.status} color={params.row.status === 'active' ? 'success' : params.row.status === 'pending' ? 'warning' : 'default'} />
+        <Stack height='100%' justifyContent='center'>
+          <Typography
+            sx={{
+              bgcolor: {
+                pending: 'orange',
+                upcoming: 'purple',
+                running: 'steelblue',
+                completed: 'green',
+                inactive: 'darkgray'
+              }[params.row.status],
+              color: 'white',
+              width: '120px',
+              textAlign: 'center',
+              borderRadius: 1,
+              fontWeight: 'medium',
+              px: 1,
+              py: 0.5,
+            }}
+          >
+            {params.row.status}
+          </Typography>
+        </Stack>
       ),
     },
     {

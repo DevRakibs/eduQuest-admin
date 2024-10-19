@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Box, Typography, Stack, IconButton, Avatar } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import CTextField from '../../common/CTextField';
@@ -8,7 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosReq } from '../../../utils/axiosReq';
 import toast from 'react-hot-toast';
 
-const AddFaq = ({ onClose }) => {
+const EditFaq = ({ data, onClose }) => {
   const [payload, setPayload] = useState({
     question: '',
     answer: '',
@@ -19,7 +19,7 @@ const AddFaq = ({ onClose }) => {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (input) => axiosReq.post('/faq/create', input, { headers: { Authorization: token } }),
+    mutationFn: (input) => axiosReq.put(`/faq/update/${data._id}`, input, { headers: { Authorization: token } }),
     onSuccess: (res) => {
       toast.success(res.data);
       queryClient.invalidateQueries(['faq'])
@@ -41,6 +41,10 @@ const AddFaq = ({ onClose }) => {
     if (!payload.answer) return toast.error('Answer is required')
     mutation.mutate(payload)
   };
+
+  useEffect(() => {
+    setPayload(data)
+  }, [data])
 
   return (
     <Box>
@@ -65,11 +69,11 @@ const AddFaq = ({ onClose }) => {
           required
         />
         <CButton loading={mutation.isPending} contained onClick={handleSave}>
-          Save
+          Update
         </CButton>
       </Stack>
     </Box >
   );
 };
 
-export default AddFaq;
+export default EditFaq;

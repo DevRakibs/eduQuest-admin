@@ -1,8 +1,9 @@
 import { Box, Paper, Stack, Tab, Tabs, styled, tabClasses, tabsClasses, useMediaQuery } from "@mui/material";
 import PropTypes from 'prop-types';
 import { useState } from "react";
-import Profile from "./tabs/profile";
+import Profile from "./tabs/Profile";
 import Account from "./tabs/Account";
+import Info from "./tabs/Info";
 
 
 const TabItem = styled(Tab)(({ theme }) => ({
@@ -49,6 +50,7 @@ CustomTabPanel.propTypes = {
 };
 
 const tabName = [
+  'Info',
   'Profile',
   'Account'
 ]
@@ -88,8 +90,9 @@ const Setting = () => {
       </Stack>
 
       <Box maxWidth='lg' sx={{ p: { xs: 1, lg: 3 } }}>
-        <CustomTabPanel value={tabIndex} index={0}><Profile /></CustomTabPanel>
-        <CustomTabPanel value={tabIndex} index={1}><Account /></CustomTabPanel>
+        <CustomTabPanel value={tabIndex} index={0}><Info /></CustomTabPanel>
+        <CustomTabPanel value={tabIndex} index={1}><Profile /></CustomTabPanel>
+        <CustomTabPanel value={tabIndex} index={2}><Account /></CustomTabPanel>
       </Box>
 
     </Box>

@@ -40,7 +40,7 @@ const Students = () => {
     setEditDialogOpen(true)
     setEditData(row)
   }
-  console.log(students)
+
   const columns = [
     // { field: 'id', headerName: 'ID', width: 100 },
     {
@@ -107,51 +107,35 @@ const Students = () => {
 
   return (
     <Box maxWidth='1600px'>
-      <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between'>
-        <Box>
-          <Typography variant='h5'>Students</Typography>
-          <Typography variant='body2'>Total Students ({students?.data?.length})</Typography>
-        </Box>
+      <Box>
+        <Typography variant='h5'>Students</Typography>
+        <Typography variant='body2'>Total Students ({students?.data?.length})</Typography>
+      </Box>
 
-        <Stack direction='row' justifyContent='space-between' gap={2} alignItems='center'>
-          {/* <Box sx={{ minWidth: 120 }} >
-            <FormControl fullWidth size='small'>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={status}
-                label="Status"
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <MenuItem value={10}>None</MenuItem>
-                <MenuItem value={10}>Active</MenuItem>
-                <MenuItem value={20}>Inactive</MenuItem>
-                <MenuItem value={30}>Blocked</MenuItem>
-              </Select>
-            </FormControl>
-          </Box> */}
-          <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add a Student</CButton>
-        </Stack>
-      </Stack>
 
       {/* add student  */}
       <CDialog open={addDialogOpen} title='Add Student' onClose={closeAddDialog}>
         <AddStudent onClose={closeAddDialog} />
       </CDialog>
 
-      <Box mt={3} mb={2}>
-        <TextField
-          size="small"
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search students..."
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Box>
+      <Stack direction='row' mt={2} gap={2} justifyContent='space-between'>
+        <Box sx={{ width: 200 }}>
+          <TextField
+            fullWidth
+            size="small"
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search..."
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+        <CButton onClick={() => setAddDialogOpen(true)} contained startIcon={<Add />} >Add a Student</CButton>
+      </Stack>
 
       <Box mt={4}>
         <DataTable
