@@ -102,7 +102,7 @@ const Enrolment = () => {
     },
   ];
 
-
+  console.log(enrollments)
   return (
     <Box maxWidth='xl'>
       <Box>
