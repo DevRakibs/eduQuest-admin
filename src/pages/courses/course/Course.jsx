@@ -15,6 +15,7 @@ import UpdateCourse from './UpdateCourse';
 
 const Course = () => {
   const [category, setCategory] = useState('');
+  const [filter, setFilter] = useState('');
   const [search, setSearch] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -26,11 +27,12 @@ const Course = () => {
   })
 
   const { data: courses, isLoading } = useQuery({
-    queryKey: ['course', category, search],
+    queryKey: ['course', category, search, filter],
     queryFn: () => axiosReq.get('/course/all', {
       params: {
         category: category,
-        search: search
+        search: search,
+        filter: filter
       }
     })
   })
@@ -174,24 +176,25 @@ const Course = () => {
             <FormControl fullWidth size='small'>
               <InputLabel>Filter</InputLabel>
               <Select
-                value={category}
+                value={filter}
                 label="Filter"
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setFilter(e.target.value)}
               >
-                <MenuItem value={''}>None</MenuItem>
-                {
-                  categories?.data?.map(c => (
-                    <MenuItem key={c._id} value={c._id}>{c.name}</MenuItem>
-                  ))
-                }
+                <MenuItem value={''}>All</MenuItem>
+                <MenuItem value={'pending'}>Pending</MenuItem>
+                <MenuItem value={'upcoming'}>Upcoming</MenuItem>
+                <MenuItem value={'running'}>Running</MenuItem>
+                <MenuItem value={'completed'}>Completed</MenuItem>
+                <MenuItem value={'inactive'}>Inactive</MenuItem>
               </Select>
             </FormControl>
           </Box>
+
           <CButton contained startIcon={<Add />} onClick={() => setAddDialogOpen(true)} >Add Course</CButton>
         </Stack>
       </Stack>
 
-      <Box mt={3} mb={2}>
+      <Box display='flex' gap={2} mt={3} mb={2}>
         <TextField
           onChange={(e) => setSearch(e.target.value)}
           size="small"
@@ -204,6 +207,23 @@ const Course = () => {
             ),
           }}
         />
+        <Box sx={{ minWidth: 120 }} >
+          <FormControl fullWidth size='small'>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={category}
+              label="Category"
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <MenuItem value={''}>None</MenuItem>
+              {
+                categories?.data?.map(c => (
+                  <MenuItem key={c._id} value={c._id}>{c.name}</MenuItem>
+                ))
+              }
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
 
       <Box mt={4}>
