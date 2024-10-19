@@ -13,7 +13,7 @@ const Dashboard = () => {
     queryKey: ['course'],
     queryFn: async () => {
       const res = await axiosReq.get('/course/all')
-      return res?.data.filter(course => course.status === 'active')
+      return res?.data.filter(course => course.status === 'upcoming' || course.status === 'running' || course.status === 'completed')
     }
   })
   const { data: students } = useQuery({
